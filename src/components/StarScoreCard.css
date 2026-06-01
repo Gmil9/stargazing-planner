@@ -36,6 +36,13 @@
   width: 100%;
 }
 
+.star-score-skeleton {
+  flex: 1;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
 .star-score-number {
   font-family: 'Inter', sans-serif;
   font-size: 80px;

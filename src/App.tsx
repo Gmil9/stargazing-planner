@@ -1,36 +1,58 @@
+import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import StarScoreCard from './components/StarScoreCard'
 import MetricCard from './components/MetricCard'
+import { useStargazingData } from './hooks/useStargazingData'
+import type { CityRecord } from './types'
 import './App.css'
 
-type BubbleColor = 'red' | 'green' | 'yellow' | 'orange'
-
-interface Metric {
-  title: string
-  score: number
-  bubble: BubbleColor
-  details: string[]
+const DEFAULT_LOCATION: CityRecord = {
+  city: 'Boulder',
+  state_id: 'CO',
+  lat: '40.0248',
+  lng: '-105.2524',
+  timezone: 'America/Denver',
 }
 
-const metrics: Metric[] = [
-  { title: 'Light Pollution', score: 5, bubble: 'red', details: ['Bortle 9', 'SQM. 21.3'] },
-  { title: 'Moon Brightness', score: 2, bubble: 'red', details: ['Full Moon'] },
-  { title: 'Cloud Cover', score: 90, bubble: 'green', details: ['Clear'] },
-  { title: 'Precipitation', score: 90, bubble: 'green', details: ['5% Chance'] },
-  { title: 'Darkness Level', score: 60, bubble: 'yellow', details: ['Twilight 5.5'] },
-  { title: 'Humidity', score: 90, bubble: 'green', details: ['20%'] },
-  { title: 'Dust', score: 50, bubble: 'orange', details: ['Hazy'] },
-  { title: 'Transparency', score: 50, bubble: 'orange', details: ['High'] },
-]
-
 function App() {
+  const [location, setLocation] = useState<CityRecord>(DEFAULT_LOCATION)
+  const [date, setDate] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>(null)
+
+  const { metrics, starScore, loading, error } = useStargazingData(location, date, time)
+
+  const showIdleBanner = !date || !time
+  const showErrorBanner = !showIdleBanner && !!error
+
   return (
     <div className="page">
       <div className="container">
-        <Sidebar />
+        <div className="sidebar-column">
+          <Sidebar
+            location={location}
+            date={date}
+            time={time}
+            onLocationChange={setLocation}
+            onDateChange={setDate}
+            onTimeChange={setTime}
+          />
+          {showIdleBanner && (
+            <div className="banner banner-idle">Select a date and time to load conditions.</div>
+          )}
+          {showErrorBanner && (
+            <div className="banner banner-error">API error: unable to load conditions.</div>
+          )}
+        </div>
+
         <main className="main">
-          <StarScoreCard />
+          <StarScoreCard starScore={starScore} loading={loading} />
           <div className="grid">
+            <MetricCard
+              title="Light Pollution"
+              score={5}
+              bubble="red"
+              details={['Bortle 9', 'SQM 21.3']}
+            />
             {metrics.map((m) => (
               <MetricCard
                 key={m.title}
@@ -38,8 +60,10 @@ function App() {
                 score={m.score}
                 bubble={m.bubble}
                 details={m.details}
+                status={m.status}
               />
             ))}
+            <MetricCard title="Transparency" score={50} bubble="orange" details={['High']} />
           </div>
         </main>
       </div>

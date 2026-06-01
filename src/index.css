@@ -48,3 +48,6 @@ p {
 .bubble-orange {
   background: var(--color-bubble-orange);
 }
+.bubble-gray {
+  background: #c4c4c4;
+}
