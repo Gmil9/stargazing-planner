@@ -1,0 +1,55 @@
+.star-score-card {
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  border-radius: 16px;
+  padding: 12px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.star-score-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.star-score-title {
+  font-family: 'Newsreader', serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: 0.1px;
+}
+
+.star-score-bubble {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.star-score-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 36px;
+  width: 100%;
+}
+
+.star-score-number {
+  font-family: 'Inter', sans-serif;
+  font-size: 80px;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-right: 32px;
+}
+
+.star-score-description {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  width: 100%;
+}
