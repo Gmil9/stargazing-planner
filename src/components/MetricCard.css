@@ -29,6 +29,13 @@
   flex-shrink: 0;
 }
 
+.metric-card-skeleton {
+  flex: 1;
+  background: #e4e4e4;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
 .metric-card-score-row {
   display: flex;
   gap: 4px;
@@ -42,6 +49,10 @@
   font-weight: 400;
   color: var(--color-secondary);
   line-height: 1;
+}
+
+.metric-card-score--empty {
+  color: var(--color-grey-text);
 }
 
 .metric-card-suffix {

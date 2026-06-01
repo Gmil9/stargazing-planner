@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dayjs": "^1.11.21",
+    "geotiff": "^3.0.5",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
