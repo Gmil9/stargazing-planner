@@ -63,7 +63,6 @@ function App() {
                 status={m.status}
               />
             ))}
-            <MetricCard title="Transparency" score={50} bubble="orange" details={['High']} />
           </div>
         </main>
       </div>

@@ -8,6 +8,9 @@ export interface WeatherData {
     cloud_cover: number[]
     precipitation_probability: number[]
     relative_humidity_2m: number[]
+    temperature_2m: number[]
+    dew_point_2m: number[]
+    visibility: number[]
   }
 }
 
@@ -19,7 +22,7 @@ export async function fetchWeather(lat: string, lng: string, timezone: string): 
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lng,
-    hourly: 'cloud_cover,precipitation_probability,relative_humidity_2m',
+    hourly: 'cloud_cover,precipitation_probability,relative_humidity_2m,temperature_2m,dew_point_2m,visibility',
     timezone,
     forecast_days: '14',
   })
@@ -27,7 +30,6 @@ export async function fetchWeather(lat: string, lng: string, timezone: string): 
   const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
   if (!res.ok) throw new Error(`Weather API error ${res.status}`)
   const data = (await res.json()) as WeatherData
-  console.log(data)
   cacheService.set(key, data, TTL)
   return data
 }

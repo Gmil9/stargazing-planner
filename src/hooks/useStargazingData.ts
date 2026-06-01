@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { fetchAstronomy } from '../services/astronomyApi'
 import { fetchWeather } from '../services/weatherApi'
 import { fetchAirQuality } from '../services/airQualityApi'
-import { scoreInvert, scorePM25 } from '../utils/scoreUtils'
+import { scoreInvert, scorePM25, scoreTransparency } from '../utils/scoreUtils'
 import { calcDarkness } from '../utils/darknessCalculator'
 import { calcStarScore } from '../utils/starScoreCalculator'
 import type { AstronomyData } from '../services/astronomyApi'
@@ -18,6 +18,7 @@ const METRIC_TITLES = [
   'Darkness Level',
   'Humidity',
   'Smoke',
+  'Transparency',
 ] as const
 
 function makeStatusMetrics(status: 'idle' | 'loading' | 'error'): MetricData[] {
@@ -52,6 +53,13 @@ function deriveMetrics(
   const pm25Val = airIdx !== -1 ? (airQuality.hourly.pm2_5[airIdx] ?? 0) : 0
   const pm25Result = scorePM25(pm25Val)
   const darknessResult = calcDarkness(time, astronomy)
+  const transparencyResult = scoreTransparency(
+    weather.hourly.cloud_cover[idx] ?? 0,
+    weather.hourly.relative_humidity_2m[idx] ?? 0,
+    weather.hourly.temperature_2m[idx] ?? 0,
+    weather.hourly.dew_point_2m[idx] ?? 0,
+    weather.hourly.visibility[idx] ?? 0,
+  )
 
   return [
     { title: 'Moon Brightness', score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], status: 'loaded' },
@@ -60,6 +68,7 @@ function deriveMetrics(
     { title: 'Darkness Level', score: darknessResult.score, bubble: darknessResult.bubble, details: [darknessResult.detail], status: 'loaded' },
     { title: 'Humidity', score: humidityResult.score, bubble: humidityResult.bubble, details: [humidityResult.detail], status: 'loaded' },
     { title: 'Smoke', score: pm25Result.score, bubble: pm25Result.bubble, details: [pm25Result.detail], status: 'loaded' },
+    { title: 'Transparency', score: transparencyResult.score, bubble: transparencyResult.bubble, details: [transparencyResult.detail], status: 'loaded' },
   ]
 }
 

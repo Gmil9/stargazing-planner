@@ -19,7 +19,7 @@ export async function fetchAirQuality(lat: string, lng: string, timezone: string
     longitude: lng,
     hourly: 'pm2_5',
     timezone,
-    forecast_days: '14',
+    forecast_days: '7',
   })
   const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${params}`)
   if (!res.ok) throw new Error(`Air quality API error ${res.status}`)

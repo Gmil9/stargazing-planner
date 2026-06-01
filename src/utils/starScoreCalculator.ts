@@ -7,12 +7,13 @@ export interface StarScoreResult {
 }
 
 const WEIGHTS: Record<string, number> = {
-  'Cloud Cover': 0.25,
-  'Moon Brightness': 0.2,
-  'Darkness Level': 0.2,
+  'Cloud Cover': 0.20,
+  'Moon Brightness': 0.20,
+  'Darkness Level': 0.20,
   Precipitation: 0.15,
-  Humidity: 0.1,
-  'PM2.5': 0.1,
+  Transparency: 0.10,
+  Humidity: 0.10,
+  Smoke: 0.05,
 }
 
 export function calcStarScore(scores: Record<string, number>): StarScoreResult {
