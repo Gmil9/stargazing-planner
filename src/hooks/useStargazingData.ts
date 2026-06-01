@@ -2,16 +2,19 @@ import { useState, useEffect, useMemo } from 'react'
 import { fetchAstronomy } from '../services/astronomyApi'
 import { fetchWeather } from '../services/weatherApi'
 import { fetchAirQuality } from '../services/airQualityApi'
-import { scoreInvert, scorePM25, scoreTransparency } from '../utils/scoreUtils'
+import { scoreInvert, scorePM25, scoreTransparency, scoreLightPollution } from '../utils/scoreUtils'
 import { calcDarkness } from '../utils/darknessCalculator'
 import { calcStarScore } from '../utils/starScoreCalculator'
 import type { AstronomyData } from '../services/astronomyApi'
 import type { WeatherData } from '../services/weatherApi'
 import type { AirQualityData } from '../services/airQualityApi'
+import { fetchLightPollution } from '../services/lightPollutionService'
+import type { LightPollutionData } from '../services/lightPollutionService'
 import type { CityRecord, MetricData, BubbleColor } from '../types'
 import type { StarScoreResult } from '../utils/starScoreCalculator'
 
 const METRIC_TITLES = [
+  'Light Pollution',
   'Moon Brightness',
   'Cloud Cover',
   'Precipitation',
@@ -37,6 +40,7 @@ function deriveMetrics(
   astronomy: AstronomyData,
   weather: WeatherData,
   airQuality: AirQualityData,
+  lightPollution: LightPollutionData,
 ): MetricData[] {
   const targetTime = `${date}T${time}`
   const idx = weather.hourly.time.findIndex((t) => t === targetTime)
@@ -60,8 +64,10 @@ function deriveMetrics(
     weather.hourly.dew_point_2m[idx] ?? 0,
     weather.hourly.visibility[idx] ?? 0,
   )
+  const lpResult = scoreLightPollution(lightPollution.bortle)
 
   return [
+    { title: 'Light Pollution', score: lpResult.score, bubble: lpResult.bubble, details: [`Bortle ${lightPollution.bortle}`, `SQM ${lightPollution.sqm.toFixed(1)}`], status: 'loaded' },
     { title: 'Moon Brightness', score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], status: 'loaded' },
     { title: 'Cloud Cover', score: cloudResult.score, bubble: cloudResult.bubble, details: [cloudResult.detail], status: 'loaded' },
     { title: 'Precipitation', score: precipResult.score, bubble: precipResult.bubble, details: [precipResult.detail], status: 'loaded' },
@@ -77,6 +83,7 @@ interface FetchResult {
   astronomy: AstronomyData
   weather: WeatherData
   airQuality: AirQualityData
+  lightPollution: LightPollutionData
 }
 
 interface FetchError {
@@ -106,10 +113,11 @@ export function useStargazingData(
       fetchAstronomy(location.lat, location.lng, date),
       fetchWeather(location.lat, location.lng, location.timezone),
       fetchAirQuality(location.lat, location.lng, location.timezone),
+      fetchLightPollution(location.lat, location.lng),
     ])
-      .then(([astronomy, weather, airQuality]) => {
+      .then(([astronomy, weather, airQuality, lightPollution]) => {
         if (cancelled) return
-        setResult({ key, astronomy, weather, airQuality })
+        setResult({ key, astronomy, weather, airQuality, lightPollution })
       })
       .catch((err: Error) => {
         if (cancelled) return
@@ -133,12 +141,12 @@ export function useStargazingData(
     if (!date || !time) return makeStatusMetrics('idle')
     if (loading) return makeStatusMetrics('loading')
     if (error || !isResultCurrent || !result) return makeStatusMetrics('error')
-    return deriveMetrics(date, time, result.astronomy, result.weather, result.airQuality)
+    return deriveMetrics(date, time, result.astronomy, result.weather, result.airQuality, result.lightPollution)
   }, [date, time, loading, error, isResultCurrent, result])
 
   const starScore = useMemo<StarScoreResult | null>(() => {
     const loaded = metrics.filter((m) => m.status === 'loaded')
-    if (loaded.length < 6) return null
+    if (loaded.length < METRIC_TITLES.length) return null
     const scoreMap = Object.fromEntries(loaded.map((m) => [m.title, m.score]))
     return calcStarScore(scoreMap)
   }, [metrics])

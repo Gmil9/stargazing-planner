@@ -32,6 +32,11 @@ export function scorePM25(value: number): ScoreResult {
   return { score, bubble: bubbleFromScore(score), detail: `${Math.round(value)} µg/m³` }
 }
 
+export function scoreLightPollution(bortle: number): { score: number; bubble: BubbleColor } {
+  const score = Math.round(((9 - bortle) / 8) * 100)
+  return { score, bubble: bubbleFromScore(score) }
+}
+
 export function scoreTransparency(
   cloudCover: number,
   relativeHumidity: number,

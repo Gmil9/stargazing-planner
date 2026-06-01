@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import StarScoreCard from './components/StarScoreCard'
 import MetricCard from './components/MetricCard'
+import LightPollutionMap from './components/LightPollutionMap'
 import { useStargazingData } from './hooks/useStargazingData'
 import type { CityRecord } from './types'
 import './App.css'
@@ -42,17 +43,12 @@ function App() {
           {showErrorBanner && (
             <div className="banner banner-error">API error: unable to load conditions.</div>
           )}
+          <LightPollutionMap location={location} />
         </div>
 
         <main className="main">
           <StarScoreCard starScore={starScore} loading={loading} />
           <div className="grid">
-            <MetricCard
-              title="Light Pollution"
-              score={5}
-              bubble="red"
-              details={['Bortle 9', 'SQM 21.3']}
-            />
             {metrics.map((m) => (
               <MetricCard
                 key={m.title}
