@@ -15,6 +15,7 @@ export type IMetricCard = {
   score: number
   bubble: IBubbleColor
   details: string[]
+  description?: string
   status?: ICardStatus
 }
 

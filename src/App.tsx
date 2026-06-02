@@ -55,14 +55,16 @@ function App() {
         <main className="main">
           <StarScoreCard starScore={starScore} loading={loading} />
           <div className="grid">
-            {metrics.map((m) => (
+            {metrics.map((m, index) => (
               <MetricCard
                 key={m.title}
                 title={m.title}
                 score={m.score}
                 bubble={m.bubble}
                 details={m.details}
+                description={m.description}
                 status={m.status}
+                popupDirection={index < 4 ? 'above' : 'below'}
               />
             ))}
           </div>
