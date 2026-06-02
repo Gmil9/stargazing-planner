@@ -43,7 +43,7 @@ export default function Sidebar({
           <DatePicker
             ref={datePickerRef}
             selected={selectedDate}
-            onChange={(d) => onDateChange(d ? dayjs(d).format('YYYY-MM-DD') : null)}
+            onChange={(d: Date | null) => onDateChange(d ? dayjs(d).format('YYYY-MM-DD') : null)}
             dateFormat="MM-dd-yyyy"
             placeholderText="mm-dd-yyyy"
             minDate={new Date()}
