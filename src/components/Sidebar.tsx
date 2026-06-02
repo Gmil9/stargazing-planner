@@ -47,6 +47,7 @@ export default function Sidebar({
             dateFormat="MM-dd-yyyy"
             placeholderText="mm-dd-yyyy"
             minDate={new Date()}
+            maxDate={dayjs().add(1, 'year').toDate()}
             className="sidebar-date-input"
             calendarClassName="sidebar-datepicker-calendar"
           />

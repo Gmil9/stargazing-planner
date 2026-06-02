@@ -22,6 +22,26 @@ export default function MetricCard({
     )
   }
 
+  if (status === 'unavailable') {
+    return (
+      <div className="metric-card">
+        <div className="metric-card-header">
+          <span className="metric-card-title">{title}</span>
+          <span className="metric-card-bubble bubble-gray" />
+        </div>
+        <div className="metric-card-score-row">
+          <span className="metric-card-score metric-card-score--empty">--</span>
+        </div>
+        <div className="metric-card-footer">
+          <div className="metric-card-details">
+            <span className="metric-card-detail">No forecast data</span>
+          </div>
+          <img src={expandIcon} className="metric-card-expand" alt="" />
+        </div>
+      </div>
+    )
+  }
+
   const showData = status === 'loaded'
 
   return (

@@ -1,5 +1,5 @@
 export type IBubbleColor = 'red' | 'yellow' | 'orange' | 'green' | 'gray'
-export type ICardStatus = 'idle' | 'loading' | 'loaded' | 'error'
+export type ICardStatus = 'idle' | 'loading' | 'loaded' | 'error' | 'unavailable'
 export type IInvertMetric = 'Moon Brightness' | 'Cloud Cover' | 'Precipitation' | 'Humidity'
 
 export type ICity = {
