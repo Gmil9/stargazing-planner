@@ -1,3 +1,11 @@
+.metric-card-wrapper {
+  position: relative;
+}
+
+.metric-card-wrapper:hover {
+  z-index: 5;
+}
+
 .metric-card {
   background: #ffffff;
   border-radius: 16px;
@@ -84,4 +92,101 @@
   height: 16px;
   object-fit: contain;
   flex-shrink: 0;
+}
+
+/* Popup */
+
+.metric-card-popup {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid var(--color-secondary);
+  border-radius: 16px;
+  padding: 14px 12px;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-secondary);
+  text-align: center;
+}
+
+.metric-card-popup-title {
+  font-family: 'Newsreader', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-secondary);
+  letter-spacing: 0.1px;
+}
+
+.metric-card-wrapper:hover .metric-card-popup {
+  opacity: 1;
+}
+
+.metric-card-popup--above {
+  bottom: calc(100% + 14px);
+}
+
+.metric-card-popup--below {
+  top: calc(100% + 14px);
+}
+
+/* Arrow for popup above card (points down toward the card) */
+.metric-card-popup--above::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--color-secondary);
+}
+
+.metric-card-popup--above::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #ffffff;
+  z-index: 1;
+}
+
+/* Arrow for popup below card (points up toward the card) */
+.metric-card-popup--below::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid var(--color-secondary);
+}
+
+.metric-card-popup--below::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #ffffff;
+  z-index: 1;
 }

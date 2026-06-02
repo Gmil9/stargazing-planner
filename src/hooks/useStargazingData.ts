@@ -19,6 +19,17 @@ const METRIC_TITLES = [
   'Transparency',
 ] as const
 
+const METRIC_DESCRIPTIONS: Record<string, string> = {
+  'Light Pollution': 'Amount of artificial light scattering from cities, roads, buildings, etc.',
+  'Moon Brightness': "Combined effect of the Moon's phase and altitude above the horizon. It is effectively a second light pollution source that moves across the sky.",
+  'Cloud Cover': 'The percentage of the sky obscured by clouds at a given hour.',
+  'Precipitation': 'Probability of active rain, snow, or other precipitation falling at observation time.',
+  'Darkness Level': 'How far the sun is below the horizon with the 3 main thresholds being Civil Twilight, Nautical Twilight, and Astronomical Twilight. True darkness begins when the Sun is 18 degrees below the horizon.',
+  'Humidity': 'Amount of water vapor present in the atmosphere. High humidity means water vapor and aerosols scatter and absorb light, reducing transparency and making the sky appear brighter and less contrasty.',
+  'Smoke': 'Particulate matter from wildfires or industrial sources suspended in the atmosphere.',
+  'Transparency': 'How clearly light passes through the atmosphere overall. Combination of humidity, temperature, dew point, visibility, and cloud cover.',
+}
+
 const FORECAST_DAYS = 12
 
 function roundTimeToNearestHour(time: string): string {
@@ -41,6 +52,7 @@ function makeStatusMetrics(status: 'idle' | 'loading' | 'error'): IMetricCard[] 
     score: 0,
     bubble: 'gray' as IBubbleColor,
     details: [],
+    description: METRIC_DESCRIPTIONS[title],
     status,
   }))
 }
@@ -57,15 +69,16 @@ function makeBeyondForecastMetrics(
   const darknessResult = calcDarkness(time, astronomy)
 
   return METRIC_TITLES.map((title) => {
+    const description = METRIC_DESCRIPTIONS[title]
     switch (title) {
       case 'Light Pollution':
-        return { title, score: lpResult.score, bubble: lpResult.bubble, details: [`Bortle ${lightPollution.bortle}`, `SQM ${lightPollution.sqm.toFixed(1)}`], status: 'loaded' as const }
+        return { title, score: lpResult.score, bubble: lpResult.bubble, details: [`Bortle ${lightPollution.bortle}`, `SQM ${lightPollution.sqm.toFixed(1)}`], description, status: 'loaded' as const }
       case 'Moon Brightness':
-        return { title, score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], status: 'loaded' as const }
+        return { title, score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], description, status: 'loaded' as const }
       case 'Darkness Level':
-        return { title, score: darknessResult.score, bubble: darknessResult.bubble, details: [darknessResult.detail], status: 'loaded' as const }
+        return { title, score: darknessResult.score, bubble: darknessResult.bubble, details: [darknessResult.detail], description, status: 'loaded' as const }
       default:
-        return { title, score: 0, bubble: 'gray' as IBubbleColor, details: [], status: 'unavailable' as const }
+        return { title, score: 0, bubble: 'gray' as IBubbleColor, details: [], description, status: 'unavailable' as const }
     }
   })
 }
@@ -104,14 +117,14 @@ function deriveMetrics(
   const lpResult = scoreLightPollution(lightPollution.bortle)
 
   return [
-    { title: 'Light Pollution', score: lpResult.score, bubble: lpResult.bubble, details: [`Bortle ${lightPollution.bortle}`, `SQM ${lightPollution.sqm.toFixed(1)}`], status: 'loaded' },
-    { title: 'Moon Brightness', score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], status: 'loaded' },
-    { title: 'Cloud Cover', score: cloudResult.score, bubble: cloudResult.bubble, details: [cloudResult.detail], status: 'loaded' },
-    { title: 'Precipitation', score: precipResult.score, bubble: precipResult.bubble, details: [precipResult.detail], status: 'loaded' },
-    { title: 'Darkness Level', score: darknessResult.score, bubble: darknessResult.bubble, details: [darknessResult.detail], status: 'loaded' },
-    { title: 'Humidity', score: humidityResult.score, bubble: humidityResult.bubble, details: [humidityResult.detail], status: 'loaded' },
-    { title: 'Smoke', score: pm25Result.score, bubble: pm25Result.bubble, details: [pm25Result.detail], status: 'loaded' },
-    { title: 'Transparency', score: transparencyResult.score, bubble: transparencyResult.bubble, details: [transparencyResult.detail], status: 'loaded' },
+    { title: 'Light Pollution', score: lpResult.score, bubble: lpResult.bubble, details: [`Bortle ${lightPollution.bortle}`, `SQM ${lightPollution.sqm.toFixed(1)}`], description: METRIC_DESCRIPTIONS['Light Pollution'], status: 'loaded' },
+    { title: 'Moon Brightness', score: moonResult.score, bubble: moonResult.bubble, details: [moonResult.detail], description: METRIC_DESCRIPTIONS['Moon Brightness'], status: 'loaded' },
+    { title: 'Cloud Cover', score: cloudResult.score, bubble: cloudResult.bubble, details: [cloudResult.detail], description: METRIC_DESCRIPTIONS['Cloud Cover'], status: 'loaded' },
+    { title: 'Precipitation', score: precipResult.score, bubble: precipResult.bubble, details: [precipResult.detail], description: METRIC_DESCRIPTIONS['Precipitation'], status: 'loaded' },
+    { title: 'Darkness Level', score: darknessResult.score, bubble: darknessResult.bubble, details: [darknessResult.detail], description: METRIC_DESCRIPTIONS['Darkness Level'], status: 'loaded' },
+    { title: 'Humidity', score: humidityResult.score, bubble: humidityResult.bubble, details: [humidityResult.detail], description: METRIC_DESCRIPTIONS['Humidity'], status: 'loaded' },
+    { title: 'Smoke', score: pm25Result.score, bubble: pm25Result.bubble, details: [pm25Result.detail], description: METRIC_DESCRIPTIONS['Smoke'], status: 'loaded' },
+    { title: 'Transparency', score: transparencyResult.score, bubble: transparencyResult.bubble, details: [transparencyResult.detail], description: METRIC_DESCRIPTIONS['Transparency'], status: 'loaded' },
   ]
 }
 
