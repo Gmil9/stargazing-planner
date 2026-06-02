@@ -5,13 +5,8 @@ import { fetchAirQuality } from '../services/airQualityApi'
 import { scoreInvert, scorePM25, scoreTransparency, scoreLightPollution } from '../utils/scoreUtils'
 import { calcDarkness } from '../utils/darknessCalculator'
 import { calcStarScore } from '../utils/starScoreCalculator'
-import type { AstronomyData } from '../services/astronomyApi'
-import type { WeatherData } from '../services/weatherApi'
-import type { AirQualityData } from '../services/airQualityApi'
 import { fetchLightPollution } from '../services/lightPollutionService'
-import type { LightPollutionData } from '../services/lightPollutionService'
-import type { CityRecord, MetricData, BubbleColor } from '../types'
-import type { StarScoreResult } from '../utils/starScoreCalculator'
+import type { ICity, IMetricCard, IBubbleColor, IStarScoreResult, IAirQualityData, IFetchError, IFetchResult, ILightPollutionData, IWeatherData, IAstronomyData } from '../types'
 
 const METRIC_TITLES = [
   'Light Pollution',
@@ -24,11 +19,11 @@ const METRIC_TITLES = [
   'Transparency',
 ] as const
 
-function makeStatusMetrics(status: 'idle' | 'loading' | 'error'): MetricData[] {
+function makeStatusMetrics(status: 'idle' | 'loading' | 'error'): IMetricCard[] {
   return METRIC_TITLES.map((title) => ({
     title,
     score: 0,
-    bubble: 'gray' as BubbleColor,
+    bubble: 'gray' as IBubbleColor,
     details: [],
     status,
   }))
@@ -37,11 +32,11 @@ function makeStatusMetrics(status: 'idle' | 'loading' | 'error'): MetricData[] {
 function deriveMetrics(
   date: string,
   time: string,
-  astronomy: AstronomyData,
-  weather: WeatherData,
-  airQuality: AirQualityData,
-  lightPollution: LightPollutionData,
-): MetricData[] {
+  astronomy: IAstronomyData,
+  weather: IWeatherData,
+  airQuality: IAirQualityData,
+  lightPollution: ILightPollutionData,
+): IMetricCard[] {
   const targetTime = `${date}T${time}`
   const idx = weather.hourly.time.findIndex((t) => t === targetTime)
   const airIdx = airQuality.hourly.time.findIndex((t) => t === targetTime)
@@ -78,26 +73,13 @@ function deriveMetrics(
   ]
 }
 
-interface FetchResult {
-  key: string
-  astronomy: AstronomyData
-  weather: WeatherData
-  airQuality: AirQualityData
-  lightPollution: LightPollutionData
-}
-
-interface FetchError {
-  key: string
-  message: string
-}
-
 export function useStargazingData(
-  location: CityRecord,
+  location: ICity,
   date: string | null,
   time: string | null,
-): { metrics: MetricData[]; starScore: StarScoreResult | null; loading: boolean; error: string | null } {
-  const [result, setResult] = useState<FetchResult | null>(null)
-  const [fetchError, setFetchError] = useState<FetchError | null>(null)
+): { metrics: IMetricCard[]; starScore: IStarScoreResult | null; loading: boolean; error: string | null } {
+  const [result, setResult] = useState<IFetchResult | null>(null)
+  const [fetchError, setFetchError] = useState<IFetchError | null>(null)
 
   // Depend on whether time is set (null vs non-null), not on its specific value.
   // Time changes re-index the cached data in useMemo without triggering a re-fetch.
@@ -137,14 +119,14 @@ export function useStargazingData(
   const loading = !!date && !!time && !isResultCurrent && !isErrorCurrent
   const error = isErrorCurrent ? fetchError.message : null
 
-  const metrics = useMemo<MetricData[]>(() => {
+  const metrics = useMemo<IMetricCard[]>(() => {
     if (!date || !time) return makeStatusMetrics('idle')
     if (loading) return makeStatusMetrics('loading')
     if (error || !isResultCurrent || !result) return makeStatusMetrics('error')
     return deriveMetrics(date, time, result.astronomy, result.weather, result.airQuality, result.lightPollution)
   }, [date, time, loading, error, isResultCurrent, result])
 
-  const starScore = useMemo<StarScoreResult | null>(() => {
+  const starScore = useMemo<IStarScoreResult | null>(() => {
     const loaded = metrics.filter((m) => m.status === 'loaded')
     if (loaded.length < METRIC_TITLES.length) return null
     const scoreMap = Object.fromEntries(loaded.map((m) => [m.title, m.score]))

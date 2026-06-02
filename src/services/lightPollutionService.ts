@@ -1,17 +1,12 @@
 import { getTiff } from './tiffStore'
 import { cacheService } from './cacheService'
+import type { ILightPollutionData } from '../types'
 
-const TTL = 30 * 24 * 60 * 60 * 1000
+const TTL = 30 * 24 * 60 * 60 * 1000 // 30 days
 
-export interface LightPollutionData {
-  radiance: number
-  sqm: number
-  bortle: number
-}
-
-export async function fetchLightPollution(lat: string, lng: string): Promise<LightPollutionData> {
+export async function fetchLightPollution(lat: string, lng: string): Promise<ILightPollutionData> {
   const key = `cache_lightpollution_${lat}_${lng}`
-  const cached = cacheService.get<LightPollutionData>(key)
+  const cached = cacheService.get<ILightPollutionData>(key)
   if (cached) return cached
 
   const tiff = await getTiff()
@@ -50,7 +45,7 @@ export async function fetchLightPollution(lat: string, lng: string): Promise<Lig
   else if (sqm >= 17.0) bortle = 8
   else bortle = 9
 
-  const data: LightPollutionData = { radiance, sqm, bortle }
+  const data: ILightPollutionData = { radiance, sqm, bortle }
   cacheService.set(key, data, TTL)
   return data
 }

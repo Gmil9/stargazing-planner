@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { bubbleFromScore } from './scoreUtils'
 import type { ScoreResult } from './scoreUtils'
-import type { AstronomyData } from '../services/astronomyApi'
+import type { IAstronomyData } from '../types'
 
 dayjs.extend(customParseFormat)
 
@@ -10,7 +10,7 @@ function parseTime(t: string) {
   return dayjs(t, 'HH:mm')
 }
 
-export function calcDarkness(time: string, data: AstronomyData): ScoreResult {
+export function calcDarkness(time: string, data: IAstronomyData): ScoreResult {
   const t = parseTime(time)
   const sunrise = parseTime(data.sunrise)
   const sunset = parseTime(data.sunset)

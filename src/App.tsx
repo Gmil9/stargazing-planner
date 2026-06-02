@@ -4,10 +4,10 @@ import StarScoreCard from './components/StarScoreCard'
 import MetricCard from './components/MetricCard'
 import LightPollutionMap from './components/LightPollutionMap'
 import { useStargazingData } from './hooks/useStargazingData'
-import type { CityRecord } from './types'
+import type { ICity } from './types'
 import './App.css'
 
-const DEFAULT_LOCATION: CityRecord = {
+const DEFAULT_LOCATION: ICity = {
   city: 'Boulder',
   state_id: 'CO',
   lat: '40.0248',
@@ -16,7 +16,7 @@ const DEFAULT_LOCATION: CityRecord = {
 }
 
 function App() {
-  const [location, setLocation] = useState<CityRecord>(DEFAULT_LOCATION)
+  const [location, setLocation] = useState<ICity>(DEFAULT_LOCATION)
   const [date, setDate] = useState<string | null>(null)
   const [time, setTime] = useState<string | null>(null)
 

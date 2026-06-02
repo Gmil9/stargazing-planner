@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { getTiff } from '../services/tiffStore'
-import type { CityRecord } from '../types'
+import type { ICity } from '../types'
 import './LightPollutionMap.css'
 
 interface Props {
-  location: CityRecord
+  location: ICity
 }
 
 const WINDOW_HALF = 100

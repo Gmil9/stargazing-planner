@@ -1,14 +1,6 @@
 import expandIcon from '../assets/expand_icon.png'
-import type { BubbleColor, CardStatus } from '../types'
+import type { IMetricCard } from '../types'
 import './MetricCard.css'
-
-interface MetricCardProps {
-  title: string
-  score: number
-  bubble: BubbleColor
-  details: string[]
-  status?: CardStatus
-}
 
 export default function MetricCard({
   title,
@@ -16,7 +8,7 @@ export default function MetricCard({
   bubble,
   details,
   status = 'loaded',
-}: MetricCardProps) {
+}: IMetricCard) {
 
   if (status === 'loading') {
     return (

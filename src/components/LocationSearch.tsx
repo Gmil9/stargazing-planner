@@ -1,23 +1,15 @@
 import { useState, useMemo } from 'react'
 import searchIcon from '../assets/search_icon.png'
-import type { CityRecord } from '../types'
+import type { ICity } from '../types'
 import './LocationSearch.css'
 
 interface LocationSearchProps {
-  value: CityRecord
-  onChange: (city: CityRecord) => void
-}
-
-type CityJson = {
-  city: string
-  state_id: string
-  lat: string
-  lng: string
-  timezone: string
+  value: ICity
+  onChange: (city: ICity) => void
 }
 
 import citiesRaw from '../assets/uscities.json'
-const cities = citiesRaw as unknown as CityJson[]
+const cities = citiesRaw as unknown as ICity[]
 
 export default function LocationSearch({ value, onChange }: LocationSearchProps) {
   const [query, setQuery] = useState('')
@@ -29,8 +21,8 @@ export default function LocationSearch({ value, onChange }: LocationSearchProps)
     return cities.filter((c) => c.city.toLowerCase().startsWith(lower)).slice(0, 10)
   }, [query])
 
-  function handleSelect(city: CityJson) {
-    onChange(city as CityRecord)
+  function handleSelect(city: ICity) {
+    onChange(city as ICity)
     setQuery('')
     setIsOpen(false)
   }
