@@ -41,6 +41,11 @@
   color: var(--color-bubble-red);
 }
 
+.banner-forecast {
+  background: #fff8e1;
+  color: #795548;
+}
+
 .main {
   flex: 1;
   display: flex;

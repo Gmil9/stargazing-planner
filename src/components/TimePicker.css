@@ -1,0 +1,97 @@
+.timepicker-wrapper {
+  position: relative;
+}
+
+.sidebar-time {
+  background: var(--color-grey);
+  border-radius: 10px;
+  padding: 10px 24px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebar-time-display {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.sidebar-time-placeholder {
+  color: #aaa;
+}
+
+.timepicker-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  padding: 12px 20px;
+  z-index: 100;
+}
+
+.timepicker-grid {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timepicker-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.timepicker-col-static {
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  padding-top: 2px;
+}
+
+.timepicker-arrow {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.timepicker-arrow:hover {
+  background: var(--color-grey);
+}
+
+.timepicker-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-primary);
+  min-width: 40px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.timepicker-colon {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 0 2px;
+  padding-bottom: 2px;
+}
+
+.timepicker-minutes {
+  color: var(--color-grey-text);
+}
+
+.timepicker-period {
+  min-width: 44px;
+}

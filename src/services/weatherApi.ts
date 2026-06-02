@@ -1,22 +1,11 @@
 import { cacheService } from './cacheService'
+import type { IWeatherData } from '../types'
 
-const TTL = 60 * 60 * 1000
+const TTL = 60 * 60 * 1000 // 1 hour
 
-export interface WeatherData {
-  hourly: {
-    time: string[]
-    cloud_cover: number[]
-    precipitation_probability: number[]
-    relative_humidity_2m: number[]
-    temperature_2m: number[]
-    dew_point_2m: number[]
-    visibility: number[]
-  }
-}
-
-export async function fetchWeather(lat: string, lng: string, timezone: string): Promise<WeatherData> {
+export async function fetchWeather(lat: string, lng: string, timezone: string): Promise<IWeatherData> {
   const key = `cache_forecast_${lat}_${lng}`
-  const cached = cacheService.get<WeatherData>(key)
+  const cached = cacheService.get<IWeatherData>(key)
   if (cached) return cached
 
   const params = new URLSearchParams({
@@ -29,7 +18,7 @@ export async function fetchWeather(lat: string, lng: string, timezone: string): 
 
   const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
   if (!res.ok) throw new Error(`Weather API error ${res.status}`)
-  const data = (await res.json()) as WeatherData
+  const data = (await res.json()) as IWeatherData
   cacheService.set(key, data, TTL)
   return data
 }

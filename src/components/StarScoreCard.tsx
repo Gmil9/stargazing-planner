@@ -1,11 +1,13 @@
-import type { StarScoreResult } from '../utils/starScoreCalculator'
+import type { IStarScoreResult } from '../types'
 import './StarScoreCard.css'
 
 interface StarScoreCardProps {
-  starScore: StarScoreResult | null
+  starScore: IStarScoreResult | null
   loading: boolean
 }
 
+
+// Room for improvement: more detailed descriptions
 function getDescription(score: number | null): string {
   if (score === null)
     return 'Select a location, date, and time to see your star score.'

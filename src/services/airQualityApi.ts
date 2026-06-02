@@ -1,17 +1,11 @@
 import { cacheService } from './cacheService'
+import type { IAirQualityData } from '../types'
 
-const TTL = 60 * 60 * 1000
+const TTL = 60 * 60 * 1000 // 1 hour  
 
-export interface AirQualityData {
-  hourly: {
-    time: string[]
-    pm2_5: number[]
-  }
-}
-
-export async function fetchAirQuality(lat: string, lng: string, timezone: string): Promise<AirQualityData> {
+export async function fetchAirQuality(lat: string, lng: string, timezone: string): Promise<IAirQualityData> {
   const key = `cache_airquality_${lat}_${lng}`
-  const cached = cacheService.get<AirQualityData>(key)
+  const cached = cacheService.get<IAirQualityData>(key)
   if (cached) return cached
 
   const params = new URLSearchParams({
@@ -23,7 +17,7 @@ export async function fetchAirQuality(lat: string, lng: string, timezone: string
   })
   const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${params}`)
   if (!res.ok) throw new Error(`Air quality API error ${res.status}`)
-  const data = (await res.json()) as AirQualityData
+  const data = (await res.json()) as IAirQualityData
   cacheService.set(key, data, TTL)
   return data
 }

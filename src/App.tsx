@@ -4,10 +4,10 @@ import StarScoreCard from './components/StarScoreCard'
 import MetricCard from './components/MetricCard'
 import LightPollutionMap from './components/LightPollutionMap'
 import { useStargazingData } from './hooks/useStargazingData'
-import type { CityRecord } from './types'
+import type { ICity } from './types'
 import './App.css'
 
-const DEFAULT_LOCATION: CityRecord = {
+const DEFAULT_LOCATION: ICity = {
   city: 'Boulder',
   state_id: 'CO',
   lat: '40.0248',
@@ -16,14 +16,15 @@ const DEFAULT_LOCATION: CityRecord = {
 }
 
 function App() {
-  const [location, setLocation] = useState<CityRecord>(DEFAULT_LOCATION)
+  const [location, setLocation] = useState<ICity>(DEFAULT_LOCATION)
   const [date, setDate] = useState<string | null>(null)
-  const [time, setTime] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>('22:00')
 
-  const { metrics, starScore, loading, error } = useStargazingData(location, date, time)
+  const { metrics, starScore, loading, error, beyondForecast } = useStargazingData(location, date, time)
 
   const showIdleBanner = !date || !time
-  const showErrorBanner = !showIdleBanner && !!error
+  const showBeyondForecastBanner = !showIdleBanner && beyondForecast
+  const showErrorBanner = !showIdleBanner && !beyondForecast && !!error
 
   return (
     <div className="page">
@@ -39,6 +40,11 @@ function App() {
           />
           {showIdleBanner && (
             <div className="banner banner-idle">Select a date and time to load conditions.</div>
+          )}
+          {showBeyondForecastBanner && (
+            <div className="banner banner-forecast">
+              Forecast data is only available within 14 days. Showing light pollution, moon brightness, and darkness level - all other metrics require a closer date.
+            </div>
           )}
           {showErrorBanner && (
             <div className="banner banner-error">API error: unable to load conditions.</div>
