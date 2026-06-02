@@ -19,7 +19,13 @@ const METRIC_TITLES = [
   'Transparency',
 ] as const
 
-const FORECAST_DAYS = 14
+const FORECAST_DAYS = 12
+
+function roundTimeToNearestHour(time: string): string {
+  const [h, m] = time.split(':').map(Number)
+  const roundedHour = m >= 30 ? Math.min(h + 1, 23) : h
+  return `${String(roundedHour).padStart(2, '0')}:00`
+}
 
 function isBeyondForecast(date: string): boolean {
   const today = new Date()
@@ -72,7 +78,8 @@ function deriveMetrics(
   airQuality: IAirQualityData,
   lightPollution: ILightPollutionData,
 ): IMetricCard[] {
-  const targetTime = `${date}T${time}`
+  const roundedTime = roundTimeToNearestHour(time)
+  const targetTime = `${date}T${roundedTime}`
   const idx = weather.hourly.time.findIndex((t) => t === targetTime)
   const airIdx = airQuality.hourly.time.findIndex((t) => t === targetTime)
   if (idx === -1) return makeStatusMetrics('error')

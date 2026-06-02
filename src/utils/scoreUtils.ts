@@ -7,9 +7,9 @@ export interface ScoreResult {
 }
 
 export function bubbleFromScore(score: number): IBubbleColor {
-  if (score >= 75) return 'green'
-  if (score >= 50) return 'yellow'
-  if (score >= 25) return 'orange'
+  if (score >= 80) return 'green'
+  if (score >= 60) return 'yellow'
+  if (score >= 40) return 'orange'
   return 'red'
 }
 

@@ -37,5 +37,5 @@ export function calcDarkness(time: string, data: IAstronomyData): ScoreResult {
   if (!t.isBefore(sunset)) {
     return { score: 40, bubble: bubbleFromScore(40), detail: 'Civil Twilight' }
   }
-  return { score: 10, bubble: bubbleFromScore(10), detail: 'Daylight' }
+  return { score: 0, bubble: bubbleFromScore(0), detail: 'Daylight' }
 }
