@@ -134,7 +134,7 @@ export function useStargazingData(
   location: ICity,
   date: string | null,
   time: string | null,
-): { metrics: IMetricCard[]; starScore: IStarScoreResult | null; loading: boolean; error: string | null; beyondForecast: boolean } {
+): { metrics: IMetricCard[]; starScore: IStarScoreResult | null; loading: boolean; error: string | null; beyondForecast: boolean; rawAstronomy: IAstronomyData | null; rawWeather: IWeatherData | null; rawAirQuality: IAirQualityData | null } {
   const [result, setResult] = useState<IFetchResult | null>(null)
   const [fetchError, setFetchError] = useState<IFetchError | null>(null)
   const [partialResult, setPartialResult] = useState<IPartialFetchResult | null>(null)
@@ -232,5 +232,20 @@ export function useStargazingData(
     return calcStarScore(scoreMap)
   }, [metrics, beyondForecast])
 
-  return { metrics, starScore, loading, error, beyondForecast }
+  const rawAstronomy: IAstronomyData | null = useMemo(() => {
+    if (beyondForecast) return isPartialResultCurrent ? partialResult!.astronomy : null
+    return isResultCurrent ? result!.astronomy : null
+  }, [beyondForecast, isPartialResultCurrent, partialResult, isResultCurrent, result])
+
+  const rawWeather: IWeatherData | null = useMemo(() => {
+    if (beyondForecast) return null
+    return isResultCurrent ? result!.weather : null
+  }, [beyondForecast, isResultCurrent, result])
+
+  const rawAirQuality: IAirQualityData | null = useMemo(() => {
+    if (beyondForecast) return null
+    return isResultCurrent ? result!.airQuality : null
+  }, [beyondForecast, isResultCurrent, result])
+
+  return { metrics, starScore, loading, error, beyondForecast, rawAstronomy, rawWeather, rawAirQuality }
 }

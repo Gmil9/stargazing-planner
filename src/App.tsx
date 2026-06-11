@@ -26,7 +26,7 @@ function App() {
   const gridRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLDivElement>(null)
 
-  const { metrics, starScore, loading, error, beyondForecast } = useStargazingData(location, date, time)
+  const { metrics, starScore, loading, error, beyondForecast, rawAstronomy, rawWeather, rawAirQuality } = useStargazingData(location, date, time)
 
   function handleExpand(title: string, rect: DOMRect) {
     const isStarScore = title === 'Star Score'
@@ -102,6 +102,12 @@ function App() {
               originRect={originRect}
               targetRect={targetRect}
               onClose={handleClose}
+              location={location}
+              date={date}
+              time={time}
+              astronomy={rawAstronomy}
+              weather={rawWeather}
+              airQuality={rawAirQuality}
             />
           )}
         </main>

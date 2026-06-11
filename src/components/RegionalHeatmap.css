@@ -1,0 +1,78 @@
+.rh-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 16px 16px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.rh-canvas-wrap {
+  flex: 1;
+  position: relative;
+  border-radius: 10px;
+  background: #0a0a14;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.rh-canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.rh-marker {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.rh-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Newsreader', serif;
+  font-size: 15px;
+  color: var(--color-grey-text);
+}
+
+.rh-overlay--error {
+  color: var(--color-bubble-red);
+  font-size: 13px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.rh-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rh-legend-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--color-grey-text);
+  white-space: nowrap;
+}
+
+.rh-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.rh-bar--cloud {
+  background: linear-gradient(to right, #0a0f28, #4a638a, #5a82b5, #bdc8e0);
+}
+
+.rh-bar--precip {
+  background: linear-gradient(to right, #000, #3cb450, #ffff00, #ff6600, #990000);
+}

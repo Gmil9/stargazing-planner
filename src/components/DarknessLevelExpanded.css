@@ -1,0 +1,68 @@
+.dl-expanded {
+  flex: 1;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  padding: 8px 16px 16px;
+  min-height: 0;
+}
+
+.dl-diagram-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dl-svg {
+  width: 180px;
+  height: 190px;
+  overflow: visible;
+}
+
+.dl-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding-left: 16px;
+}
+
+.dl-stage-label {
+  font-family: 'Newsreader', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.dl-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dl-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dl-row--truedark .dl-row-label {
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.dl-row-label {
+  font-family: 'Newsreader', serif;
+  font-size: 14px;
+  color: var(--color-grey-text);
+  flex: 1;
+}
+
+.dl-row-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-secondary);
+}

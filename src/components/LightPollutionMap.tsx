@@ -5,6 +5,8 @@ import './LightPollutionMap.css'
 
 interface Props {
   location: ICity
+  windowHalf?: number
+  compact?: boolean
 }
 
 const WINDOW_HALF = 100
@@ -29,10 +31,11 @@ function radianceToRGB(t: number): [number, number, number] {
   return [255, 200 + Math.round(s * 55), Math.round(s * 220)]
 }
 
-export default function LightPollutionMap({ location }: Props) {
+export default function LightPollutionMap({ location, windowHalf, compact }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'error' | 'done'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
+  const wh = windowHalf ?? WINDOW_HALF
 
   useEffect(() => {
     let cancelled = false
@@ -57,10 +60,10 @@ export default function LightPollutionMap({ location }: Props) {
         const col = Math.floor(((lngNum - west) / (east - west)) * width)
         const row = Math.floor(((north - latNum) / (north - south)) * height)
 
-        const x0 = Math.max(0, col - WINDOW_HALF)
-        const y0 = Math.max(0, row - WINDOW_HALF)
-        const x1 = Math.min(width, col + WINDOW_HALF + 1)
-        const y1 = Math.min(height, row + WINDOW_HALF + 1)
+        const x0 = Math.max(0, col - wh)
+        const y0 = Math.max(0, row - wh)
+        const x1 = Math.min(width, col + wh + 1)
+        const y1 = Math.min(height, row + wh + 1)
 
         const rasters = await image.readRasters({ window: [x0, y0, x1, y1] })
         if (cancelled) return
@@ -114,16 +117,18 @@ export default function LightPollutionMap({ location }: Props) {
 
     render()
     return () => { cancelled = true }
-  }, [location])
+  }, [location, wh])
 
   return (
     <div className="lp-map">
-      <div className="lp-map-header">
-        <span className="lp-map-title">Light Pollution</span>
-        <span className="lp-map-coords">
-          {parseFloat(location.lat).toFixed(3)}°,&nbsp;{parseFloat(location.lng).toFixed(3)}°
-        </span>
-      </div>
+      {!compact && (
+        <div className="lp-map-header">
+          <span className="lp-map-title">Light Pollution</span>
+          <span className="lp-map-coords">
+            {parseFloat(location.lat).toFixed(3)}°,&nbsp;{parseFloat(location.lng).toFixed(3)}°
+          </span>
+        </div>
+      )}
 
       <div className="lp-map-canvas-wrap">
         {status === 'loading' && (

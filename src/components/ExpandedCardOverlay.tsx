@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import type { IMetricCard, IStarScoreResult } from '../types'
+import type { IMetricCard, IStarScoreResult, IAstronomyData, IWeatherData, IAirQualityData, ICity } from '../types'
+import StarScoreExpanded from './StarScoreExpanded'
+import LightPollutionExpanded from './LightPollutionExpanded'
+import CloudCoverExpanded from './CloudCoverExpanded'
+import PrecipitationExpanded from './PrecipitationExpanded'
+import DarknessLevelExpanded from './DarknessLevelExpanded'
+import TransparencyExpanded from './TransparencyExpanded'
+import HumidityExpanded from './HumidityExpanded'
+import SmokeExpanded from './SmokeExpanded'
+import MoonBrightnessExpanded from './MoonBrightnessExpanded'
 import './ExpandedCardOverlay.css'
 
 interface Props {
@@ -9,6 +18,20 @@ interface Props {
   originRect: DOMRect
   targetRect: DOMRect
   onClose: () => void
+  location: ICity
+  date: string | null
+  time: string | null
+  astronomy: IAstronomyData | null
+  weather: IWeatherData | null
+  airQuality: IAirQualityData | null
+}
+
+function getStarDescription(score: number | null): string | null {
+  if (score === null) return null
+  if (score >= 75) return 'Excellent conditions for stargazing tonight. Expect clear, dark skies with minimal interference.'
+  if (score >= 50) return 'Good conditions for stargazing. Some factors may slightly reduce visibility.'
+  if (score >= 25) return 'Fair conditions tonight. Multiple factors are limiting the quality of your session.'
+  return 'Poor conditions for stargazing tonight. Consider rescheduling for a better night.'
 }
 
 export default function ExpandedCardOverlay({
@@ -18,6 +41,12 @@ export default function ExpandedCardOverlay({
   originRect,
   targetRect,
   onClose,
+  location,
+  date,
+  time,
+  astronomy,
+  weather,
+  airQuality,
 }: Props) {
   const [entered, setEntered] = useState(false)
   const [closing, setClosing] = useState(false)
@@ -60,7 +89,7 @@ export default function ExpandedCardOverlay({
         onTransitionEnd={() => { if (closing) onClose() }}
       >
         {isStarScore ? (
-          <StarScoreLayout score={score} bubble={bubble} />
+          <StarScoreLayout score={score} bubble={bubble} description={getStarDescription(score)} />
         ) : (
           <MetricLayout
             title={cardTitle}
@@ -71,7 +100,31 @@ export default function ExpandedCardOverlay({
         )}
 
         <div className="expanded-card-content">
-          {/* per-card content components rendered here in future issues */}
+          {cardTitle === 'Star Score' && <StarScoreExpanded />}
+          {cardTitle === 'Light Pollution' && (
+            <LightPollutionExpanded location={location} />
+          )}
+          {cardTitle === 'Cloud Cover' && date && time && (
+            <CloudCoverExpanded location={location} date={date} time={time} />
+          )}
+          {cardTitle === 'Precipitation' && date && time && (
+            <PrecipitationExpanded location={location} date={date} time={time} />
+          )}
+          {cardTitle === 'Darkness Level' && astronomy && time && (
+            <DarknessLevelExpanded astronomy={astronomy} time={time} />
+          )}
+          {cardTitle === 'Transparency' && weather && date && time && (
+            <TransparencyExpanded weather={weather} date={date} time={time} />
+          )}
+          {cardTitle === 'Humidity' && weather && date && time && (
+            <HumidityExpanded weather={weather} date={date} time={time} />
+          )}
+          {cardTitle === 'Smoke' && airQuality && date && time && (
+            <SmokeExpanded airQuality={airQuality} date={date} time={time} />
+          )}
+          {cardTitle === 'Moon Brightness' && astronomy && (
+            <MoonBrightnessExpanded astronomy={astronomy} />
+          )}
         </div>
 
         <button
@@ -122,19 +175,24 @@ function MetricLayout({
 function StarScoreLayout({
   score,
   bubble,
+  description,
 }: {
   score: number | null
   bubble: string
+  description: string | null
 }) {
   return (
     <div className="expanded-star-header">
-      <div className="expanded-star-title-row">
-        <span className="expanded-star-title">Star Score</span>
-        <span className={`expanded-star-bubble bubble-${bubble}`} />
-      </div>
-      <div className="expanded-star-body">
+      <div className="expanded-star-left">
+        <div className="expanded-star-title-row">
+          <span className="expanded-star-title">Star Score</span>
+          <span className={`expanded-star-bubble bubble-${bubble}`} />
+        </div>
         <span className="expanded-star-score">{score ?? '--'}</span>
       </div>
+      {description && (
+        <p className="expanded-star-description">{description}</p>
+      )}
     </div>
   )
 }
