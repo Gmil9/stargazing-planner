@@ -11,7 +11,7 @@ export async function fetchWeather(lat: string, lng: string, timezone: string): 
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lng,
-    hourly: 'cloud_cover,precipitation_probability,relative_humidity_2m,temperature_2m,dew_point_2m,visibility',
+    hourly: 'cloud_cover,precipitation_probability,relative_humidity_2m,temperature_2m,dew_point_2m,visibility,vapour_pressure_deficit',
     timezone,
     forecast_days: '14',
   })

@@ -59,3 +59,8 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+
+.grid.cards-expanded .metric-card-wrapper:hover .metric-card-popup {
+  opacity: 0;
+  pointer-events: none;
+}

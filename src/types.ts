@@ -28,6 +28,9 @@ export type IAirQualityData = {
   hourly: {
     time: string[]
     pm2_5: number[]
+    dust: number[]
+    aerosol_optical_depth: number[]
+    pm10: number[]
   }
 }
 
@@ -46,6 +49,13 @@ export type IAstronomyData = {
   moon_illumination_percentage: number
   evening: ITwilightPeriod
   morning: ITwilightPeriod
+  moon_altitude?: number
+  moon_azimuth?: number
+  moonrise?: string
+  moonset?: string
+  moon_phase?: string
+  next_moon_phase_date?: string
+  next_moon_phase_name?: string
 }
 
 export type ILightPollutionData = {
@@ -63,6 +73,7 @@ export type IWeatherData = {
     temperature_2m: number[]
     dew_point_2m: number[]
     visibility: number[]
+    vapour_pressure_deficit: number[]
   }
 }
 
