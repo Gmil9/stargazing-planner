@@ -1,12 +1,12 @@
-import type { IAstronomyData } from '../types'
-import phaseNew from '../assets/MoonPhases/phase_new.png'
-import phaseWaxingCrescent from '../assets/MoonPhases/phase_waxing_crescent.png'
-import phaseFirstQuarter from '../assets/MoonPhases/phase_first_quarter.png'
-import phaseWaxingGibbous from '../assets/MoonPhases/phase_waxing_gibbous.png'
-import phaseFull from '../assets/MoonPhases/phase_full.png'
-import phaseWaningGibbous from '../assets/MoonPhases/phase_waning_gibbous.png'
-import phaseThirdQuarter from '../assets/MoonPhases/phase_third_quarter.png'
-import phaseWaningCrescent from '../assets/MoonPhases/phase_waning_crescent.png'
+import type { IAstronomyData } from '../../types'
+import phaseNew from '../../assets/MoonPhases/phase_new.png'
+import phaseWaxingCrescent from '../../assets/MoonPhases/phase_waxing_crescent.png'
+import phaseFirstQuarter from '../../assets/MoonPhases/phase_first_quarter.png'
+import phaseWaxingGibbous from '../../assets/MoonPhases/phase_waxing_gibbous.png'
+import phaseFull from '../../assets/MoonPhases/phase_full.png'
+import phaseWaningGibbous from '../../assets/MoonPhases/phase_waning_gibbous.png'
+import phaseThirdQuarter from '../../assets/MoonPhases/phase_third_quarter.png'
+import phaseWaningCrescent from '../../assets/MoonPhases/phase_waning_crescent.png'
 import './MoonBrightnessExpanded.css'
 
 interface Props {
@@ -61,7 +61,7 @@ export default function MoonBrightnessExpanded({ astronomy }: Props) {
         {astronomy.moon_phase && (
           <div className="mb-row mb-row--phase">
             <span className="mb-row-label">Phase</span>
-            <span className="mb-row-value mb-row-value--phase">{astronomy.moon_phase}</span>
+            <span className="mb-row-value mb-row-value--phase">{astronomy.moon_phase.replace("_", " ")}</span>
           </div>
         )}
         <div className="mb-row">
@@ -71,13 +71,17 @@ export default function MoonBrightnessExpanded({ astronomy }: Props) {
         {astronomy.moon_altitude !== undefined && (
           <div className="mb-row">
             <span className="mb-row-label">Altitude</span>
-            <span className="mb-row-value">{astronomy.moon_altitude.toFixed(1)}<span className="mb-row-unit">°</span></span>
+            <div className="align-detail-top">
+              <span className="mb-row-value">{`${astronomy.moon_altitude.toFixed(1)}°`}</span>
+            </div>
           </div>
         )}
         {astronomy.moon_azimuth !== undefined && (
           <div className="mb-row">
             <span className="mb-row-label">Azimuth</span>
-            <span className="mb-row-value">{astronomy.moon_azimuth.toFixed(1)}<span className="mb-row-unit">°</span></span>
+            <div className="align-detail-top">
+              <span className="mb-row-value">{`${astronomy.moon_azimuth.toFixed(1)}°`}</span>
+            </div>
           </div>
         )}
         {astronomy.moonrise && (

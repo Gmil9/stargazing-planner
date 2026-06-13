@@ -1,5 +1,5 @@
-import type { IWeatherData } from '../types'
-import './ExpandedCard.css'
+import type { IWeatherData } from '../../types'
+import '../ExpandedCard.css'
 
 interface Props {
   weather: IWeatherData

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { IMetricCard, IStarScoreResult, IAstronomyData, IWeatherData, IAirQualityData, ICity } from '../types'
-import StarScoreExpanded from './StarScoreExpanded'
-import LightPollutionExpanded from './LightPollutionExpanded'
-import CloudCoverExpanded from './CloudCoverExpanded'
-import PrecipitationExpanded from './PrecipitationExpanded'
-import DarknessLevelExpanded from './DarknessLevelExpanded'
-import TransparencyExpanded from './TransparencyExpanded'
-import HumidityExpanded from './HumidityExpanded'
-import SmokeExpanded from './SmokeExpanded'
-import MoonBrightnessExpanded from './MoonBrightnessExpanded'
+import StarScoreExpanded from './StarScore/StarScoreExpanded'
+import LightPollutionExpanded from './LightPollution/LightPollutionExpanded'
+import CloudCoverExpanded from './CloudCover/CloudCoverExpanded'
+import PrecipitationExpanded from './Precipitation/PrecipitationExpanded'
+import DarknessLevelExpanded from './DarknessLevel/DarknessLevelExpanded'
+import TransparencyExpanded from './Transparency/TransparencyExpanded'
+import HumidityExpanded from './Humidity/HumidityExpanded'
+import SmokeExpanded from './Smoke/SmokeExpanded'
+import MoonBrightnessExpanded from './MoonBrightness/MoonBrightnessExpanded'
 import './ExpandedCardOverlay.css'
 
 interface Props {
@@ -48,17 +48,15 @@ export default function ExpandedCardOverlay({
   weather,
   airQuality,
 }: Props) {
-  const [entered, setEntered] = useState(false)
-  const [closing, setClosing] = useState(false)
+  const [phase, setPhase] = useState<'entering' | 'open' | 'collapsing'>('entering')
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setEntered(true))
+    const id = requestAnimationFrame(() => setPhase('open'))
     return () => cancelAnimationFrame(id)
   }, [])
 
   function handleClose() {
-    setClosing(true)
-    setEntered(false)
+    setPhase('collapsing')
   }
 
   const dx = originRect.left - targetRect.left
@@ -66,13 +64,37 @@ export default function ExpandedCardOverlay({
   const sx = originRect.width / targetRect.width
   const sy = originRect.height / targetRect.height
 
-  const overlayStyle: React.CSSProperties = {
+  const insetTop = Math.max(0, originRect.top - targetRect.top)
+  const insetLeft = Math.max(0, originRect.left - targetRect.left)
+  const insetRight = Math.max(0, targetRect.right - originRect.right)
+  const insetBottom = Math.max(0, targetRect.bottom - originRect.bottom)
+
+  const baseStyle: React.CSSProperties = {
     left: targetRect.left,
     top: targetRect.top,
     width: targetRect.width,
     height: targetRect.height,
-    transform: entered ? 'none' : `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
   }
+
+  const phaseStyle: React.CSSProperties =
+    phase === 'entering'
+      ? {
+          transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
+          transition: 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
+        }
+      : phase === 'open'
+      ? {
+          transform: 'none',
+          clipPath: 'inset(0px round 16px)',
+          transition: 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
+        }
+      : {
+          transform: 'none',
+          clipPath: `inset(${insetTop}px ${insetRight}px ${insetBottom}px ${insetLeft}px round 16px)`,
+          transition: 'clip-path 100ms cubic-bezier(0.4, 0, 1, 1)',
+        }
+
+  const overlayStyle = { ...baseStyle, ...phaseStyle }
 
   const isStarScore = cardTitle === 'Star Score'
   const bubble = isStarScore ? (starScore?.bubble ?? 'gray') : (metric?.bubble ?? 'gray')
@@ -81,12 +103,11 @@ export default function ExpandedCardOverlay({
 
   return (
     <>
-      <div className="expanded-card-backdrop" onClick={handleClose} />
       <div
         className={`expanded-card-overlay${isStarScore ? ' expanded-card-overlay--star' : ''}`}
         style={overlayStyle}
         onClick={handleClose}
-        onTransitionEnd={() => { if (closing) onClose() }}
+        onTransitionEnd={(e) => { if (phase === 'collapsing' && e.propertyName === 'clip-path') onClose() }}
       >
         {isStarScore ? (
           <StarScoreLayout score={score} bubble={bubble} description={getStarDescription(score)} />
@@ -158,13 +179,14 @@ function MetricLayout({
       <div className="expanded-metric-title-group">
         <span className="expanded-metric-title">{title}</span>
         <span className={`expanded-metric-bubble bubble-${bubble}`} />
+        {score !== null && (
+          <div className="expanded-metric-score-group">
+            <span className="expanded-metric-score">{score}</span>
+            <span className="expanded-metric-suffix">/100</span>
+          </div>
+        )}
       </div>
-      {score !== null && (
-        <div className="expanded-metric-score-group">
-          <span className="expanded-metric-score">{score}</span>
-          <span className="expanded-metric-suffix">/100</span>
-        </div>
-      )}
+      
       {description && (
         <p className="expanded-metric-description">{description}</p>
       )}

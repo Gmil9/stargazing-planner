@@ -1,5 +1,5 @@
-import type { IAirQualityData } from '../types'
-import './ExpandedCard.css'
+import type { IAirQualityData } from '../../types'
+import '../ExpandedCard.css'
 
 interface Props {
   airQuality: IAirQualityData

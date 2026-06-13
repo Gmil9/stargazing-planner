@@ -57,6 +57,28 @@
   image-rendering: pixelated;
 }
 
+/* Expanded view: grow to fill the card and center the canvas without stretching */
+.lp-map--expanded {
+  flex: 1;
+  min-height: 0;
+}
+
+.lp-map--expanded .lp-map-canvas-wrap {
+  aspect-ratio: unset;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-map--expanded .lp-map-canvas {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .lp-map-legend {
   display: flex;
   align-items: center;

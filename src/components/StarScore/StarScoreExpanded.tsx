@@ -1,4 +1,4 @@
-import './ExpandedCardOverlay.css'
+import '../ExpandedCardOverlay.css'
 
 export default function StarScoreExpanded() {
   return (

@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react'
 import Sidebar from './components/Sidebar'
-import StarScoreCard from './components/StarScoreCard'
+import StarScoreCard from './components/StarScore/StarScoreCard'
 import MetricCard from './components/MetricCard'
-import LightPollutionMap from './components/LightPollutionMap'
+import LightPollutionMap from './components/LightPollution/LightPollutionMap'
 import ExpandedCardOverlay from './components/ExpandedCardOverlay'
 import { useStargazingData } from './hooks/useStargazingData'
 import type { ICity } from './types'
@@ -25,8 +25,11 @@ function App() {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLDivElement>(null)
+  const lpMapRef = useRef<HTMLDivElement>(null)
 
   const { metrics, starScore, loading, error, beyondForecast, rawAstronomy, rawWeather, rawAirQuality } = useStargazingData(location, date, time)
+
+  const MAP_CARDS = ['Light Pollution', 'Cloud Cover', 'Precipitation']
 
   function handleExpand(title: string, rect: DOMRect) {
     const isStarScore = title === 'Star Score'
@@ -34,7 +37,14 @@ function App() {
     if (!containerRef.current) return
     setExpandedCard(title)
     setOriginRect(rect)
-    setTargetRect(containerRef.current.getBoundingClientRect())
+
+    const baseRect = containerRef.current.getBoundingClientRect()
+    if (MAP_CARDS.includes(title) && lpMapRef.current) {
+      const lpBottom = lpMapRef.current.getBoundingClientRect().bottom
+      setTargetRect(new DOMRect(baseRect.left, baseRect.top, baseRect.width, lpBottom - baseRect.top))
+    } else {
+      setTargetRect(baseRect)
+    }
   }
 
   function handleClose() {
@@ -70,7 +80,9 @@ function App() {
           {showErrorBanner && (
             <div className="banner banner-error">API error: unable to load conditions.</div>
           )}
-          <LightPollutionMap location={location} />
+          <div ref={lpMapRef}>
+            <LightPollutionMap location={location} compact />
+          </div>
         </div>
 
         <main className="main" ref={mainRef}>

@@ -1,5 +1,5 @@
-import RegionalHeatmap from './RegionalHeatmap'
-import type { ICity } from '../types'
+import RegionalHeatmap from '../RegionalHeatmap'
+import type { ICity } from '../../types'
 
 interface Props {
   location: ICity

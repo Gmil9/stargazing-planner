@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import type { IStarScoreResult } from '../types'
+import type { IStarScoreResult } from '../../types'
 import './StarScoreCard.css'
 
 interface StarScoreCardProps {

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { getTiff } from '../services/tiffStore'
-import type { ICity } from '../types'
+import { getTiff } from '../../services/tiffStore'
+import type { ICity } from '../../types'
 import './LightPollutionMap.css'
 
 interface Props {
   location: ICity
-  windowHalf?: number
+  windowWidth?: number
+  windowHeight?: number
   compact?: boolean
 }
 
@@ -31,11 +32,12 @@ function radianceToRGB(t: number): [number, number, number] {
   return [255, 200 + Math.round(s * 55), Math.round(s * 220)]
 }
 
-export default function LightPollutionMap({ location, windowHalf, compact }: Props) {
+export default function LightPollutionMap({ location, windowWidth, windowHeight, compact }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'error' | 'done'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
-  const wh = windowHalf ?? WINDOW_HALF
+  const wx = windowWidth ?? WINDOW_HALF
+  const wy = windowHeight ?? WINDOW_HALF
 
   useEffect(() => {
     let cancelled = false
@@ -60,10 +62,10 @@ export default function LightPollutionMap({ location, windowHalf, compact }: Pro
         const col = Math.floor(((lngNum - west) / (east - west)) * width)
         const row = Math.floor(((north - latNum) / (north - south)) * height)
 
-        const x0 = Math.max(0, col - wh)
-        const y0 = Math.max(0, row - wh)
-        const x1 = Math.min(width, col + wh + 1)
-        const y1 = Math.min(height, row + wh + 1)
+        const x0 = Math.max(0, col - wx)
+        const y0 = Math.max(0, row - wy)
+        const x1 = Math.min(width, col + wx + 1)
+        const y1 = Math.min(height, row + wy + 1)
 
         const rasters = await image.readRasters({ window: [x0, y0, x1, y1] })
         if (cancelled) return
@@ -117,11 +119,11 @@ export default function LightPollutionMap({ location, windowHalf, compact }: Pro
 
     render()
     return () => { cancelled = true }
-  }, [location, wh])
+  }, [location, wx, wy])
 
   return (
-    <div className="lp-map">
-      {!compact && (
+    <div className={`lp-map${!compact ? ' lp-map--expanded' : ''}`}>
+      {compact && (
         <div className="lp-map-header">
           <span className="lp-map-title">Light Pollution</span>
           <span className="lp-map-coords">
