@@ -85,7 +85,7 @@ function App() {
             <div className="banner banner-error">API error: unable to load conditions.</div>
           )}
           <div ref={lpMapRef}>
-            <LightPollutionMap location={location} compact />
+            <LightPollutionMap location={location} compact windowWidth={425} windowHeight={250} />
           </div>
         </div>
 
