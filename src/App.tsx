@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import StarScoreCard from './components/StarScore/StarScoreCard'
 import MetricCard from './components/MetricCard'
-import LightPollutionMap from './components/LightPollution/LightPollutionMap'
+import LightPollutionMap, { warmCache } from './components/LightPollution/LightPollutionMap'
 import ExpandedCardOverlay from './components/ExpandedCardOverlay'
 import { useStargazingData } from './hooks/useStargazingData'
 import type { ICity } from './types'
@@ -28,6 +28,10 @@ function App() {
   const lpMapRef = useRef<HTMLDivElement>(null)
 
   const { metrics, starScore, loading, error, beyondForecast, rawAstronomy, rawWeather, rawAirQuality } = useStargazingData(location, date, time)
+
+  // Pre-render the expanded overlay dimensions (425×250) in the background as
+  // soon as the location is known, so the first open is instant from cache.
+  useEffect(() => { warmCache(location, 425, 250) }, [location])
 
   const MAP_CARDS = ['Light Pollution', 'Cloud Cover', 'Precipitation']
 

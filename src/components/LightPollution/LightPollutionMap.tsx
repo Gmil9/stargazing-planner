@@ -11,11 +11,9 @@ interface Props {
 }
 
 const WINDOW_HALF = 100
-// Fixed log scale max: ~20 nW/cm²/sr covers Bortle 1–8 range well
 const LOG_MAX = Math.log1p(20)
 
 function radianceToRGB(t: number): [number, number, number] {
-  // Earth-at-night palette: black → indigo → dark orange → yellow → white
   if (t < 0.25) {
     const s = t / 0.25
     return [Math.round(s * 40), 0, Math.round(s * 70)]
@@ -32,6 +30,85 @@ function radianceToRGB(t: number): [number, number, number] {
   return [255, 200 + Math.round(s * 55), Math.round(s * 220)]
 }
 
+interface CacheEntry {
+  imageData: ImageData
+  cx: number
+  cy: number
+}
+
+const renderCache = new Map<string, CacheEntry>()
+const pendingCache = new Map<string, Promise<CacheEntry>>()
+
+async function buildCacheEntry(location: ICity, wx: number, wy: number): Promise<CacheEntry> {
+  const key = `${location.lat},${location.lng},${wx},${wy}`
+
+  const existing = renderCache.get(key)
+  if (existing) return existing
+
+  // Coalesce concurrent requests for the same key so readRasters only runs once.
+  const pending = pendingCache.get(key)
+  if (pending) return pending
+
+  const promise = (async () => {
+    const tiff = await getTiff()
+    const image = await tiff.getImage()
+    const [west, south, east, north] = image.getBoundingBox()
+    const width = image.getWidth()
+    const height = image.getHeight()
+
+    const latNum = parseFloat(location.lat)
+    const lngNum = parseFloat(location.lng)
+
+    if (lngNum < west || lngNum > east || latNum < south || latNum > north) {
+      throw new Error('Location outside coverage area')
+    }
+
+    const col = Math.floor(((lngNum - west) / (east - west)) * width)
+    const row = Math.floor(((north - latNum) / (north - south)) * height)
+
+    const x0 = Math.max(0, col - wx)
+    const y0 = Math.max(0, row - wy)
+    const x1 = Math.min(width, col + wx + 1)
+    const y1 = Math.min(height, row + wy + 1)
+
+    const rasters = await image.readRasters({ window: [x0, y0, x1, y1] })
+
+    const w = x1 - x0
+    const h = y1 - y0
+    const imgData = new ImageData(w, h)
+    const data = rasters[0] as Float32Array
+
+    for (let i = 0; i < data.length; i++) {
+      const v = data[i]
+      const norm = isFinite(v) && v > 0 ? Math.min(1, Math.log1p(v) / LOG_MAX) : 0
+      const [r, g, b] = radianceToRGB(norm)
+      imgData.data[i * 4] = r
+      imgData.data[i * 4 + 1] = g
+      imgData.data[i * 4 + 2] = b
+      imgData.data[i * 4 + 3] = 255
+    }
+
+    const cx = col - x0
+    const cy = row - y0
+    const entry: CacheEntry = { imageData: imgData, cx, cy }
+    renderCache.set(key, entry)
+    pendingCache.delete(key)
+    return entry
+  })()
+
+  pendingCache.set(key, promise)
+  promise.catch(() => pendingCache.delete(key))
+  return promise
+}
+
+// Call this to pre-render in the background before the overlay opens.
+export function warmCache(location: ICity, wx: number, wy: number): void {
+  const key = `${location.lat},${location.lng},${wx},${wy}`
+  if (!renderCache.has(key) && !pendingCache.has(key)) {
+    buildCacheEntry(location, wx, wy).catch(() => {})
+  }
+}
+
 export default function LightPollutionMap({ location, windowWidth, windowHeight, compact }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'error' | 'done'>('loading')
@@ -45,60 +122,18 @@ export default function LightPollutionMap({ location, windowWidth, windowHeight,
 
     async function render() {
       try {
-        const tiff = await getTiff()
-        const image = await tiff.getImage()
-        const [west, south, east, north] = image.getBoundingBox()
-        const width = image.getWidth()
-        const height = image.getHeight()
-
-        const latNum = parseFloat(location.lat)
-        const lngNum = parseFloat(location.lng)
-
-        if (lngNum < west || lngNum > east || latNum < south || latNum > north) {
-          if (!cancelled) { setErrorMsg('Location outside coverage area'); setStatus('error') }
-          return
-        }
-
-        const col = Math.floor(((lngNum - west) / (east - west)) * width)
-        const row = Math.floor(((north - latNum) / (north - south)) * height)
-
-        const x0 = Math.max(0, col - wx)
-        const y0 = Math.max(0, row - wy)
-        const x1 = Math.min(width, col + wx + 1)
-        const y1 = Math.min(height, row + wy + 1)
-
-        const rasters = await image.readRasters({ window: [x0, y0, x1, y1] })
+        const { imageData, cx, cy } = await buildCacheEntry(location, wx, wy)
         if (cancelled) return
 
         const canvas = canvasRef.current
         if (!canvas) return
 
-        const w = x1 - x0
-        const h = y1 - y0
-        canvas.width = w
-        canvas.height = h
+        canvas.width = imageData.width
+        canvas.height = imageData.height
 
         const ctx = canvas.getContext('2d')!
-        const imgData = ctx.createImageData(w, h)
-        const data = rasters[0] as Float32Array
+        ctx.putImageData(imageData, 0, 0)
 
-        for (let i = 0; i < data.length; i++) {
-          const v = data[i]
-          const norm = isFinite(v) && v > 0
-            ? Math.min(1, Math.log1p(v) / LOG_MAX)
-            : 0
-          const [r, g, b] = radianceToRGB(norm)
-          imgData.data[i * 4] = r
-          imgData.data[i * 4 + 1] = g
-          imgData.data[i * 4 + 2] = b
-          imgData.data[i * 4 + 3] = 255
-        }
-
-        ctx.putImageData(imgData, 0, 0)
-
-        // Draw crosshair at selected pixel
-        const cx = col - x0
-        const cy = row - y0
         ctx.strokeStyle = 'rgba(255, 70, 70, 0.95)'
         ctx.lineWidth = 1.5
         ctx.beginPath()
