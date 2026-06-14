@@ -1,4 +1,6 @@
 import type { IWeatherData } from '../../types'
+import { useUnits } from '../../context/UnitContext'
+import { cToF, deltaCToF } from '../../utils/unitUtils'
 import '../ExpandedCard.css'
 
 interface Props {
@@ -15,6 +17,7 @@ function getIdx(times: string[], date: string, time: string): number {
 
 export default function HumidityExpanded({ weather, date, time }: Props) {
   const idx = getIdx(weather.hourly.time, date, time)
+  const { units } = useUnits()
 
   if (idx === -1) {
     return <div className="ec-no-data">Data not available for selected time</div>
@@ -25,8 +28,13 @@ export default function HumidityExpanded({ weather, date, time }: Props) {
   const vpd = weather.hourly.vapour_pressure_deficit[idx] ?? 0
   const temp = weather.hourly.temperature_2m[idx] ?? 0
   const spreadC = temp - dew
-  // 5°F = 5 × 5/9 ≈ 2.78°C
+  // 5°F = 5 × 5/9 ≈ 2.78°C — threshold stays in °C since data is always metric
   const dewRisk = spreadC < 2.78
+
+  const imperial = units === 'imperial'
+  const tempUnit = imperial ? '°F' : '°C'
+  const displayDew = imperial ? cToF(dew).toFixed(1) : dew.toFixed(1)
+  const displaySpread = imperial ? deltaCToF(spreadC).toFixed(1) : spreadC.toFixed(1)
 
   return (
     <div className="ec-readout-list">
@@ -41,8 +49,8 @@ export default function HumidityExpanded({ weather, date, time }: Props) {
       <div className="ec-readout-row">
         <span className="ec-readout-label">Dew Point</span>
         <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{dew.toFixed(1)}</span>
-          <span className="ec-readout-unit">°C</span>
+          <span className="ec-readout-value">{displayDew}</span>
+          <span className="ec-readout-unit">{tempUnit}</span>
         </div>
         <span className="ec-readout-qualifier" />
       </div>
@@ -57,8 +65,8 @@ export default function HumidityExpanded({ weather, date, time }: Props) {
       <div className="ec-readout-row">
         <span className="ec-readout-label">Dew Point Spread</span>
         <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{spreadC.toFixed(1)}</span>
-          <span className="ec-readout-unit">°C</span>
+          <span className="ec-readout-value">{displaySpread}</span>
+          <span className="ec-readout-unit">{tempUnit}</span>
         </div>
         {dewRisk ? (
           <span className="ec-dew-risk">Dew risk</span>

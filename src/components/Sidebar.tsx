@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import calendarIcon from '../assets/calendar_icon.png'
 import LocationSearch from './LocationSearch/LocationSearch'
 import TimePicker from './TimePicker/TimePicker'
+import { useUnits } from '../context/UnitContext'
 import type { ICity } from '../types'
 import './Sidebar.css'
 
@@ -27,6 +28,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const datePickerRef = useRef<DatePicker>(null)
   const selectedDate = date ? dayjs(date).toDate() : null
+  const { units, setUnits } = useUnits()
 
   return (
     <div className="sidebar">
@@ -66,6 +68,26 @@ export default function Sidebar({
       <div className="sidebar-section">
         <span className="sidebar-label">Time</span>
         <TimePicker value={time} onChange={onTimeChange} />
+      </div>
+
+      <div className="sidebar-divider" />
+
+      <div className="sidebar-section">
+        <span className="sidebar-label">Units</span>
+        <div className="sidebar-unit-toggle">
+          <button
+            className={`sidebar-unit-btn${units === 'metric' ? ' sidebar-unit-btn--active' : ''}`}
+            onClick={() => setUnits('metric')}
+          >
+            Metric
+          </button>
+          <button
+            className={`sidebar-unit-btn${units === 'imperial' ? ' sidebar-unit-btn--active' : ''}`}
+            onClick={() => setUnits('imperial')}
+          >
+            Imperial
+          </button>
+        </div>
       </div>
     </div>
   )

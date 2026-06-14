@@ -1,4 +1,6 @@
 import type { IWeatherData } from '../../types'
+import { useUnits } from '../../context/UnitContext'
+import { cToF, deltaCToF, mToMi } from '../../utils/unitUtils'
 import '../ExpandedCard.css'
 
 interface Props {
@@ -50,6 +52,7 @@ function getIdx(times: string[], date: string, time: string): number {
 
 export default function TransparencyExpanded({ weather, date, time }: Props) {
   const idx = getIdx(weather.hourly.time, date, time)
+  const { units } = useUnits()
 
   if (idx === -1) {
     return <div className="ec-no-data">Data not available for selected time</div>
@@ -62,12 +65,20 @@ export default function TransparencyExpanded({ weather, date, time }: Props) {
   const vis = weather.hourly.visibility[idx] ?? 0
   const spread = temp - dew
 
+  const imperial = units === 'imperial'
+  const tempUnit = imperial ? '°F' : '°C'
+  const displayTemp = imperial ? `${cToF(temp).toFixed(1)}${tempUnit}` : `${temp.toFixed(1)}${tempUnit}`
+  const displaySpread = imperial ? `${deltaCToF(spread).toFixed(1)}${tempUnit}` : `${spread.toFixed(1)}${tempUnit}`
+  const displayVis = imperial
+    ? `${mToMi(vis).toFixed(1)} mi`
+    : `${(vis / 1000).toFixed(1)} km`
+
   const rows: Array<{ label: string; display: string; qual?: QLevel }> = [
     { label: 'Cloud Cover', display: `${Math.round(cloud)}%`, qual: cloudQual(cloud) },
     { label: 'Humidity', display: `${Math.round(humidity)}%`, qual: humidityQual(humidity) },
-    { label: 'Temperature', display: `${temp.toFixed(1)}°C` },
-    { label: 'Dew Point Spread', display: `${spread.toFixed(1)}°C`, qual: dewSpreadQual(spread) },
-    { label: 'Visibility', display: `${(vis / 1000).toFixed(1)} km`, qual: visibilityQual(vis) },
+    { label: 'Temperature', display: displayTemp },
+    { label: 'Dew Point Spread', display: displaySpread, qual: dewSpreadQual(spread) },
+    { label: 'Visibility', display: displayVis, qual: visibilityQual(vis) },
   ]
 
   return (
