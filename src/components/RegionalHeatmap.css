@@ -14,21 +14,12 @@
   border-radius: 10px;
   background: #0a0a14;
   overflow: hidden;
-  min-height: 0;
+  min-height: 220px;
 }
 
-.rh-canvas {
+.rh-map {
   width: 100%;
   height: 100%;
-  image-rendering: pixelated;
-}
-
-.rh-marker {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
 }
 
 .rh-overlay {

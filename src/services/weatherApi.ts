@@ -1,5 +1,6 @@
 import { cacheService } from './cacheService'
 import type { IWeatherData } from '../types'
+import { gridPoint, GRID_RANGE } from '../utils/regionalGrid'
 
 const TTL = 60 * 60 * 1000 // 1 hour
 
@@ -11,7 +12,7 @@ export async function fetchRegionalWeather(
   field: 'cloud_cover' | 'precipitation_probability',
   timezone: string,
 ): Promise<RegionalEntry[]> {
-  const key = `cache_regional_${centerLat}_${centerLng}_${field}`
+  const key = `cache_regional_${centerLat}_${centerLng}_${field}_${GRID_RANGE}`
   const cached = cacheService.get<RegionalEntry[]>(key)
   if (cached) return cached
 
@@ -21,8 +22,9 @@ export async function fetchRegionalWeather(
   const lngs: string[] = []
   for (let row = 0; row < 7; row++) {
     for (let col = 0; col < 7; col++) {
-      lats.push((lat + (3 - row) / 3).toFixed(5))
-      lngs.push((lng + (col - 3) / 3).toFixed(5))
+      const [pLat, pLng] = gridPoint(lat, lng, row, col)
+      lats.push(pLat.toFixed(5))
+      lngs.push(pLng.toFixed(5))
     }
   }
 
