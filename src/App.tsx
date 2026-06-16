@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import dayjs from 'dayjs'
 import Sidebar from './components/Sidebar'
 import StarScoreCard from './components/StarScore/StarScoreCard'
 import MetricCard from './components/MetricCard'
@@ -51,6 +52,21 @@ function App() {
     }
   }
 
+  function handleTimeChange(newTime: string | null) {
+    if (newTime && time && date) {
+      const [oh, om] = time.split(':').map(Number)
+      const [nh, nm] = newTime.split(':').map(Number)
+      const oldMins = oh * 60 + om
+      const newMins = nh * 60 + nm
+      if (oldMins >= 23 * 60 && newMins < 60) {
+        setDate(dayjs(date).add(1, 'day').format('YYYY-MM-DD'))
+      } else if (oldMins < 60 && newMins >= 23 * 60) {
+        setDate(dayjs(date).subtract(1, 'day').format('YYYY-MM-DD'))
+      }
+    }
+    setTime(newTime)
+  }
+
   function handleClose() {
     setExpandedCard(null)
     setOriginRect(null)
@@ -71,7 +87,7 @@ function App() {
             time={time}
             onLocationChange={setLocation}
             onDateChange={setDate}
-            onTimeChange={setTime}
+            onTimeChange={handleTimeChange}
           />
           {showIdleBanner && (
             <div className="banner banner-idle">Select a date and time to load conditions.</div>
