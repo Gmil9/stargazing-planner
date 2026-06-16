@@ -84,7 +84,7 @@ function renderOverlay(
       imgData.data[i] = r
       imgData.data[i + 1] = g
       imgData.data[i + 2] = b
-      imgData.data[i + 3] = 255
+      imgData.data[i + 3] = Math.round(t * 255)
     }
   }
 
