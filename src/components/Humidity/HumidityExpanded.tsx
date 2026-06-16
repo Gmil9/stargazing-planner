@@ -1,10 +1,13 @@
-import type { IWeatherData } from '../../types'
+import type { IWeatherData, ICity } from '../../types'
 import { useUnits } from '../../context/UnitContext'
 import { cToF, deltaCToF } from '../../utils/unitUtils'
+import RegionalHeatmap from '../RegionalHeatmap'
 import '../ExpandedCard.css'
+import './HumidityExpanded.css'
 
 interface Props {
   weather: IWeatherData
+  location: ICity
   date: string
   time: string
 }
@@ -15,7 +18,7 @@ function getIdx(times: string[], date: string, time: string): number {
   return times.findIndex((t) => t === `${date}T${String(rh).padStart(2, '0')}:00`)
 }
 
-export default function HumidityExpanded({ weather, date, time }: Props) {
+export default function HumidityExpanded({ weather, location, date, time }: Props) {
   const idx = getIdx(weather.hourly.time, date, time)
   const { units } = useUnits()
 
@@ -37,42 +40,49 @@ export default function HumidityExpanded({ weather, date, time }: Props) {
   const displaySpread = imperial ? deltaCToF(spreadC).toFixed(1) : spreadC.toFixed(1)
 
   return (
-    <div className="ec-readout-list">
-      <div className="ec-readout-row">
-        <span className="ec-readout-label">Relative Humidity</span>
-        <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{Math.round(humidity)}</span>
-          <span className="ec-readout-unit">%</span>
-        </div>
-        <span className="ec-readout-qualifier" />
+    <div className="humidity-split">
+      <div className="humidity-split-map">
+        <RegionalHeatmap location={location} date={date} time={time} field="relative_humidity_2m" />
       </div>
-      <div className="ec-readout-row">
-        <span className="ec-readout-label">Dew Point</span>
-        <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{displayDew}</span>
-          <span className="ec-readout-unit">{tempUnit}</span>
+      <div className="humidity-split-stats">
+        <div className="ec-readout-list">
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Relative Humidity</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{Math.round(humidity)}</span>
+              <span className="ec-readout-unit">%</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Dew Point</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{displayDew}</span>
+              <span className="ec-readout-unit">{tempUnit}</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Vapour Pressure Deficit</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{vpd.toFixed(2)}</span>
+              <span className="ec-readout-unit">kPa</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Dew Point Spread</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{displaySpread}</span>
+              <span className="ec-readout-unit">{tempUnit}</span>
+            </div>
+            {dewRisk ? (
+              <span className="ec-dew-risk">Dew risk</span>
+            ) : (
+              <span className="ec-readout-qualifier" />
+            )}
+          </div>
         </div>
-        <span className="ec-readout-qualifier" />
-      </div>
-      <div className="ec-readout-row">
-        <span className="ec-readout-label">Vapour Pressure Deficit</span>
-        <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{vpd.toFixed(2)}</span>
-          <span className="ec-readout-unit">kPa</span>
-        </div>
-        <span className="ec-readout-qualifier" />
-      </div>
-      <div className="ec-readout-row">
-        <span className="ec-readout-label">Dew Point Spread</span>
-        <div className="ec-readout-value-wrap">
-          <span className="ec-readout-value">{displaySpread}</span>
-          <span className="ec-readout-unit">{tempUnit}</span>
-        </div>
-        {dewRisk ? (
-          <span className="ec-dew-risk">Dew risk</span>
-        ) : (
-          <span className="ec-readout-qualifier" />
-        )}
       </div>
     </div>
   )

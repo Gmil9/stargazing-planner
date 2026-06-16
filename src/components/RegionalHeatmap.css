@@ -68,3 +68,7 @@
 .rh-bar--precip {
   background: linear-gradient(to right, #000, #3cb450, #ffff00, #ff6600, #990000);
 }
+
+.rh-bar--humidity {
+  background: linear-gradient(to right, #d2a03c, #3c6488, #1e50dc);
+}

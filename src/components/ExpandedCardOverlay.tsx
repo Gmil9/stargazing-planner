@@ -138,7 +138,7 @@ export default function ExpandedCardOverlay({
             <TransparencyExpanded weather={weather} date={date} time={time} />
           )}
           {cardTitle === 'Humidity' && weather && date && time && (
-            <HumidityExpanded weather={weather} date={date} time={time} />
+            <HumidityExpanded weather={weather} location={location} date={date} time={time} />
           )}
           {cardTitle === 'Smoke' && airQuality && date && time && (
             <SmokeExpanded airQuality={airQuality} date={date} time={time} />

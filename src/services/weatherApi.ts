@@ -9,7 +9,7 @@ type RegionalEntry = { time: string[]; values: number[] }
 export async function fetchRegionalWeather(
   centerLat: string,
   centerLng: string,
-  field: 'cloud_cover' | 'precipitation_probability',
+  field: 'cloud_cover' | 'precipitation_probability' | 'relative_humidity_2m',
   timezone: string,
 ): Promise<RegionalEntry[]> {
   const key = `cache_regional_${centerLat}_${centerLng}_${field}_${GRID_RANGE}`

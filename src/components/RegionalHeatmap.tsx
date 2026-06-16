@@ -10,7 +10,7 @@ interface Props {
   location: ICity
   date: string
   time: string
-  field: 'cloud_cover' | 'precipitation_probability'
+  field: 'cloud_cover' | 'precipitation_probability' | 'relative_humidity_2m'
 }
 
 type MapBounds = [[number, number], [number, number]]
@@ -22,6 +22,16 @@ function cloudColor(t: number): [number, number, number] {
   }
   const s = (t - 0.5) / 0.5
   return [Math.round(90 + s * 115), Math.round(105 + s * 105), Math.round(150 + s * 60)]
+}
+
+function humidityColor(t: number): [number, number, number] {
+  // 0 = dry (amber), 1 = humid (deep blue)
+  if (t < 0.5) {
+    const s = t / 0.5
+    return [Math.round(210 - s * 150), Math.round(160 - s * 60), Math.round(60 + s * 80)]
+  }
+  const s = (t - 0.5) / 0.5
+  return [Math.round(60 - s * 30), Math.round(100 - s * 20), Math.round(140 + s * 80)]
 }
 
 function precipColor(t: number): [number, number, number] {
@@ -60,7 +70,7 @@ function renderOverlay(
   centerLat: number,
   centerLng: number,
   mapBounds: MapBounds,
-  field: 'cloud_cover' | 'precipitation_probability',
+  field: 'cloud_cover' | 'precipitation_probability' | 'relative_humidity_2m',
 ): string {
   const size = 256
   const canvas = document.createElement('canvas')
@@ -79,7 +89,10 @@ function renderOverlay(
       const gy = Math.max(0, Math.min(6, latToRow(centerLat, lat)))
       const raw = bilinear(grid, gx, gy)
       const t = Math.max(0, Math.min(1, raw / 100))
-      const [r, g, b] = field === 'cloud_cover' ? cloudColor(t) : precipColor(t)
+      const [r, g, b] =
+        field === 'cloud_cover' ? cloudColor(t) :
+        field === 'precipitation_probability' ? precipColor(t) :
+        humidityColor(t)
       const i = (py * size + px) * 4
       imgData.data[i] = r
       imgData.data[i + 1] = g
@@ -192,9 +205,15 @@ export default function RegionalHeatmap({ location, date, time, field }: Props) 
     setStatus('done')
   }, [weatherGrid, mapBounds, lat, lng, field])
 
-  const labelLow = field === 'cloud_cover' ? 'Clear' : 'No Rain'
-  const labelHigh = field === 'cloud_cover' ? 'Overcast' : 'Heavy Rain'
-  const barClass = field === 'cloud_cover' ? 'rh-bar--cloud' : 'rh-bar--precip'
+  const labelLow =
+    field === 'cloud_cover' ? 'Clear' :
+    field === 'precipitation_probability' ? 'No Rain' : 'Dry'
+  const labelHigh =
+    field === 'cloud_cover' ? 'Overcast' :
+    field === 'precipitation_probability' ? 'Heavy Rain' : 'Humid'
+  const barClass =
+    field === 'cloud_cover' ? 'rh-bar--cloud' :
+    field === 'precipitation_probability' ? 'rh-bar--precip' : 'rh-bar--humidity'
 
   return (
     <div className="rh-wrap">
