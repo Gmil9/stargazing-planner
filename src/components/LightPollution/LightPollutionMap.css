@@ -31,7 +31,6 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: #000;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -51,10 +50,22 @@
   color: var(--color-bubble-red);
 }
 
-.lp-map-canvas {
+/* Expanded view: Leaflet map fills the card */
+.lp-map--expanded {
+  flex: 1;
+  min-height: 0;
+}
+
+.lp-map--expanded .lp-map-canvas-wrap {
+  aspect-ratio: unset;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.lp-map-leaflet {
   width: 100%;
   height: 100%;
-  image-rendering: pixelated;
 }
 
 .lp-map-legend {

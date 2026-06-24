@@ -1,0 +1,89 @@
+import type { IWeatherData, ICity } from '../../types'
+import { useUnits } from '../../context/UnitContext'
+import { cToF, deltaCToF } from '../../utils/unitUtils'
+import RegionalHeatmap from '../RegionalHeatmap'
+import '../ExpandedCard.css'
+import './HumidityExpanded.css'
+
+interface Props {
+  weather: IWeatherData
+  location: ICity
+  date: string
+  time: string
+}
+
+function getIdx(times: string[], date: string, time: string): number {
+  const [h, m] = time.split(':').map(Number)
+  const rh = m >= 30 ? Math.min(h + 1, 23) : h
+  return times.findIndex((t) => t === `${date}T${String(rh).padStart(2, '0')}:00`)
+}
+
+export default function HumidityExpanded({ weather, location, date, time }: Props) {
+  const idx = getIdx(weather.hourly.time, date, time)
+  const { units } = useUnits()
+
+  if (idx === -1) {
+    return <div className="ec-no-data">Data not available for selected time</div>
+  }
+
+  const humidity = weather.hourly.relative_humidity_2m[idx] ?? 0
+  const dew = weather.hourly.dew_point_2m[idx] ?? 0
+  const vpd = weather.hourly.vapour_pressure_deficit[idx] ?? 0
+  const temp = weather.hourly.temperature_2m[idx] ?? 0
+  const spreadC = temp - dew
+  // 5°F = 5 × 5/9 ≈ 2.78°C — threshold stays in °C since data is always metric
+  const dewRisk = spreadC < 2.78
+
+  const imperial = units === 'imperial'
+  const tempUnit = imperial ? '°F' : '°C'
+  const displayDew = imperial ? cToF(dew).toFixed(1) : dew.toFixed(1)
+  const displaySpread = imperial ? deltaCToF(spreadC).toFixed(1) : spreadC.toFixed(1)
+
+  return (
+    <div className="humidity-split">
+      <div className="humidity-split-map">
+        <RegionalHeatmap location={location} date={date} time={time} field="relative_humidity_2m" />
+      </div>
+      <div className="humidity-split-stats">
+        <div className="ec-readout-list">
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Relative Humidity</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{Math.round(humidity)}</span>
+              <span className="ec-readout-unit">%</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Dew Point</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{displayDew}</span>
+              <span className="ec-readout-unit">{tempUnit}</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Vapour Pressure Deficit</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{vpd.toFixed(2)}</span>
+              <span className="ec-readout-unit">kPa</span>
+            </div>
+            <span className="ec-readout-qualifier" />
+          </div>
+          <div className="ec-readout-row">
+            <span className="ec-readout-label">Dew Point Spread</span>
+            <div className="ec-readout-value-wrap">
+              <span className="ec-readout-value">{displaySpread}</span>
+              <span className="ec-readout-unit">{tempUnit}</span>
+            </div>
+            {dewRisk ? (
+              <span className="ec-dew-risk">Dew risk</span>
+            ) : (
+              <span className="ec-readout-qualifier" />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
