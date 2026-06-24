@@ -1,8 +1,12 @@
+import { useRef } from 'react'
 import expandIcon from '../assets/expand_icon.png'
 import type { IMetricCard } from '../types'
 import './MetricCard.css'
 
-type IMetricCardProps = IMetricCard & { popupDirection?: 'above' | 'below' }
+type IMetricCardProps = IMetricCard & {
+  popupDirection?: 'above' | 'below'
+  onExpand?: (rect: DOMRect) => void
+}
 
 export default function MetricCard({
   title,
@@ -12,7 +16,15 @@ export default function MetricCard({
   description,
   status = 'loaded',
   popupDirection = 'above',
+  onExpand,
 }: IMetricCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  function handleClick() {
+    if (onExpand && cardRef.current) {
+      onExpand(cardRef.current.getBoundingClientRect())
+    }
+  }
 
   const popup = description ? (
     <div className={`metric-card-popup metric-card-popup--${popupDirection}`}>
@@ -24,7 +36,7 @@ export default function MetricCard({
     return (
       <div className="metric-card-wrapper">
         {popup}
-        <div className="metric-card">
+        <div className="metric-card" ref={cardRef} onClick={handleClick}>
           <div className="metric-card-header">
             <span className="metric-card-title">{title}</span>
             <span className="metric-card-bubble bubble-gray" />
@@ -39,7 +51,7 @@ export default function MetricCard({
     return (
       <div className="metric-card-wrapper">
         {popup}
-        <div className="metric-card">
+        <div className="metric-card" ref={cardRef} onClick={handleClick}>
           <div className="metric-card-header">
             <span className="metric-card-title">{title}</span>
             <span className="metric-card-bubble bubble-gray" />
@@ -63,7 +75,7 @@ export default function MetricCard({
   return (
     <div className="metric-card-wrapper">
       {popup}
-      <div className="metric-card">
+      <div className="metric-card" ref={cardRef} onClick={handleClick}>
         <div className="metric-card-header">
           <span className="metric-card-title">{title}</span>
           <span className={`metric-card-bubble bubble-${bubble}`} />

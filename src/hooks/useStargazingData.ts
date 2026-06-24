@@ -24,7 +24,7 @@ const METRIC_DESCRIPTIONS: Record<string, string> = {
   'Moon Brightness': "Combined effect of the Moon's phase and altitude above the horizon. It is effectively a second light pollution source that moves across the sky.",
   'Cloud Cover': 'The percentage of the sky obscured by clouds at a given hour.',
   'Precipitation': 'Probability of active rain, snow, or other precipitation falling at observation time.',
-  'Darkness Level': 'How far the sun is below the horizon with the 3 main thresholds being Civil Twilight, Nautical Twilight, and Astronomical Twilight. True darkness begins when the Sun is 18 degrees below the horizon.',
+  'Darkness Level': 'How far the sun is below the horizon, broken into 3 phases followed by True Darkness.',
   'Humidity': 'Amount of water vapor present in the atmosphere. High humidity means water vapor and aerosols scatter and absorb light, reducing transparency and making the sky appear brighter and less contrasty.',
   'Smoke': 'Particulate matter from wildfires or industrial sources suspended in the atmosphere.',
   'Transparency': 'How clearly light passes through the atmosphere overall. Combination of humidity, temperature, dew point, visibility, and cloud cover.',
@@ -134,7 +134,7 @@ export function useStargazingData(
   location: ICity,
   date: string | null,
   time: string | null,
-): { metrics: IMetricCard[]; starScore: IStarScoreResult | null; loading: boolean; error: string | null; beyondForecast: boolean } {
+): { metrics: IMetricCard[]; starScore: IStarScoreResult | null; loading: boolean; error: string | null; beyondForecast: boolean; rawAstronomy: IAstronomyData | null; rawWeather: IWeatherData | null; rawAirQuality: IAirQualityData | null } {
   const [result, setResult] = useState<IFetchResult | null>(null)
   const [fetchError, setFetchError] = useState<IFetchError | null>(null)
   const [partialResult, setPartialResult] = useState<IPartialFetchResult | null>(null)
@@ -232,5 +232,20 @@ export function useStargazingData(
     return calcStarScore(scoreMap)
   }, [metrics, beyondForecast])
 
-  return { metrics, starScore, loading, error, beyondForecast }
+  const rawAstronomy: IAstronomyData | null = useMemo(() => {
+    if (beyondForecast) return isPartialResultCurrent ? partialResult!.astronomy : null
+    return isResultCurrent ? result!.astronomy : null
+  }, [beyondForecast, isPartialResultCurrent, partialResult, isResultCurrent, result])
+
+  const rawWeather: IWeatherData | null = useMemo(() => {
+    if (beyondForecast) return null
+    return isResultCurrent ? result!.weather : null
+  }, [beyondForecast, isResultCurrent, result])
+
+  const rawAirQuality: IAirQualityData | null = useMemo(() => {
+    if (beyondForecast) return null
+    return isResultCurrent ? result!.airQuality : null
+  }, [beyondForecast, isResultCurrent, result])
+
+  return { metrics, starScore, loading, error, beyondForecast, rawAstronomy, rawWeather, rawAirQuality }
 }

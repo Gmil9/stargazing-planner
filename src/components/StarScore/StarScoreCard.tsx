@@ -1,13 +1,13 @@
-import type { IStarScoreResult } from '../types'
+import { useRef } from 'react'
+import type { IStarScoreResult } from '../../types'
 import './StarScoreCard.css'
 
 interface StarScoreCardProps {
   starScore: IStarScoreResult | null
   loading: boolean
+  onExpand?: (rect: DOMRect) => void
 }
 
-
-// Room for improvement: more detailed descriptions
 function getDescription(score: number | null): string {
   if (score === null)
     return 'Select a location, date, and time to see your star score.'
@@ -19,12 +19,19 @@ function getDescription(score: number | null): string {
   return 'Poor conditions for stargazing tonight. Consider rescheduling for a better night.'
 }
 
-export default function StarScoreCard({ starScore, loading }: StarScoreCardProps) {
+export default function StarScoreCard({ starScore, loading, onExpand }: StarScoreCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null)
   const bubble = starScore?.bubble ?? 'gray'
   const score = starScore?.score ?? null
 
+  function handleClick() {
+    if (onExpand && cardRef.current) {
+      onExpand(cardRef.current.getBoundingClientRect())
+    }
+  }
+
   return (
-    <div className="star-score-card">
+    <div className="star-score-card" ref={cardRef} onClick={handleClick} style={{ cursor: 'pointer' }}>
       <div className="star-score-header">
         <span className="star-score-title">Star Score</span>
         <span className={`star-score-bubble bubble-${bubble}`} />

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
-import searchIcon from '../assets/search_icon.png'
-import type { ICity } from '../types'
+import searchIcon from '../../assets/search_icon.png'
+import type { ICity } from '../../types'
 import './LocationSearch.css'
 
 interface LocationSearchProps {
@@ -8,7 +8,7 @@ interface LocationSearchProps {
   onChange: (city: ICity) => void
 }
 
-import citiesRaw from '../assets/uscities.json'
+import citiesRaw from '../../assets/uscities.json'
 const cities = citiesRaw as unknown as ICity[]
 
 export default function LocationSearch({ value, onChange }: LocationSearchProps) {

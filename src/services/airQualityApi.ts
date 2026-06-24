@@ -11,7 +11,7 @@ export async function fetchAirQuality(lat: string, lng: string, timezone: string
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lng,
-    hourly: 'pm2_5',
+    hourly: 'pm2_5,dust,aerosol_optical_depth,pm10',
     timezone,
     forecast_days: '7',
   })
